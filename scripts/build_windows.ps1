@@ -1,4 +1,4 @@
-# Build Chess God Board with PyInstaller (Windows)
+# Build Chess Vision Assistant with PyInstaller (Windows)
 # Does NOT bundle stockfish.exe — user must provide separately.
 
 $ErrorActionPreference = "Stop"
@@ -20,7 +20,7 @@ Write-Host "Running PyInstaller..."
 .\.venv\Scripts\python.exe -m PyInstaller `
     --noconfirm `
     --windowed `
-    --name ChessGodBoard `
+    --name ChessVisionAssistant `
     --add-data "assets;assets" `
     --add-data "config.example.json;." `
     --hidden-import chess `
@@ -30,5 +30,5 @@ Write-Host "Running PyInstaller..."
     --collect-all PySide6 `
     app\main.py
 
-Write-Host "Done. Output: dist\ChessGodBoard\"
+Write-Host "Done. Output: dist\ChessVisionAssistant\"
 Write-Host "Place stockfish.exe separately and select it in the app (Stockfish…)."

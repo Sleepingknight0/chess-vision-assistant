@@ -25,7 +25,7 @@ class OverlayToolbar(QWidget):
 
     def __init__(self) -> None:
         super().__init__()
-        self.setWindowTitle("God Board Controls")
+        self.setWindowTitle("Chess Vision Assistant Controls")
         self.setWindowFlags(
             Qt.WindowType.FramelessWindowHint
             | Qt.WindowType.WindowStaysOnTopHint

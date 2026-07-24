@@ -3,9 +3,9 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "chess-god-board"
+name = "chess-vision-assistant"
 version = "0.1.0"
-description = "Side-panel Stockfish coach for chess practice and analysis (Windows)"
+description = "Chess Vision Assistant — desktop chess play assistant with Stockfish (Windows)"
 readme = "README.md"
 requires-python = ">=3.12,<3.14"
 dependencies = [

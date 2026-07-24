@@ -36,7 +36,7 @@ def candidate_names() -> list[str]:
 
 
 def fetch(url: str, dest: Path) -> int:
-    req = urllib.request.Request(url, headers={"User-Agent": "ChessGodBoard/1.0"})
+    req = urllib.request.Request(url, headers={"User-Agent": "ChessVisionAssistant/1.0"})
     last: Exception | None = None
     for attempt in range(5):
         try:

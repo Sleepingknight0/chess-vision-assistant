@@ -1,4 +1,4 @@
-"""Chess God Board entry point — side-panel Stockfish coach."""
+"""Chess Vision Assistant entry point — chess play assistant with Stockfish."""
 
 from __future__ import annotations
 
@@ -21,10 +21,10 @@ def main() -> int:
         Qt.HighDpiScaleFactorRoundingPolicy.PassThrough
     )
     setup_logging()
-    logger.info("Starting Chess God Board")
+    logger.info("Starting Chess Vision Assistant")
 
     app = QApplication(sys.argv)
-    app.setApplicationName("Chess God Board")
+    app.setApplicationName("Chess Vision Assistant")
     app.setOrganizationName("ChessVisionAssistant")
     apply_dark_theme(app, styles_path())
 

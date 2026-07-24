@@ -1,6 +1,6 @@
-# Chess God Board
+# Chess Vision Assistant
 
-Windows desktop app (PySide6) — กระดานหมากรุกข้างจอ + **Stockfish** สำหรับฝึก/วิเคราะห์
+Windows desktop app (PySide6) — **ผู้ช่วยเล่นหมากรุก** ข้างจอ + วิเคราะห์ด้วย **Stockfish**
 
 > **ขอบเขต:** ใช้เพื่อ practice / analysis เท่านั้น  
 > แอป**ไม่**ควบคุมเมาส์ ไม่วิ่งเดินอัตโนมัติในเกม และไม่เลี่ยง anti-cheat
@@ -38,7 +38,7 @@ python -m app
 
 ## คุณสมบัติหลัก
 
-- กระดานข้างจอ + Always on top
+- กระดานช่วยเล่นข้างจอ + Always on top
 - วิเคราะห์แบบมีขอบเขตเวลา (ไม่ปั่น CPU ตลอด) + **ponder** (คิดล่วงหน้าตาคู่แข่ง)
 - **Opening Book** (polyglot `.bin`) — เปิด/ปิดด้วยติ๊ก **ตำรา**
 - **Syzygy tablebase** — จบเกม ≤5 หมาก (วางที่ `engines/syzygy/` หรือ `python tools/download_syzygy_345.py`)
@@ -77,7 +77,7 @@ powershell -ExecutionPolicy Bypass -File scripts\build_windows.ps1
 
 ```
 app/            entry point
-gui/            God Board UI + widgets
+gui/            Assistant UI + widgets
 chess_core/     FEN / validation / special moves
 chess_engine/   Stockfish UCI, ponder, opening book
 overlay/        transparent overlay + setup frame

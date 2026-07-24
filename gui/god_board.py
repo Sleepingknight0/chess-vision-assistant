@@ -97,7 +97,7 @@ class GodBoardWindow(QMainWindow):
 
     def __init__(self) -> None:
         super().__init__()
-        self.setWindowTitle("Chess God Board — Stockfish")
+        self.setWindowTitle("Chess Vision Assistant — Stockfish")
         self.resize(460, 820)
         self.setMinimumWidth(380)
         # Side of screen, stays on top
@@ -151,7 +151,7 @@ class GodBoardWindow(QMainWindow):
         outer.setContentsMargins(8, 8, 8, 8)
         outer.setSpacing(6)
 
-        title = QLabel("Chess God Board")
+        title = QLabel("Chess Vision Assistant")
         title.setFont(QFont("Segoe UI", 16, QFont.Weight.Bold))
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         outer.addWidget(title)

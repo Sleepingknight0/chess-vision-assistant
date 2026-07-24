@@ -1,4 +1,4 @@
-"""Smoke import for God Board app."""
+"""Smoke import for Chess Vision Assistant."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""App shell — God Board only (vision system removed from product UI)."""
+"""App shell — Chess Vision Assistant main window."""
 
 from __future__ import annotations
 
