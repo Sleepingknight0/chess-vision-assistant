@@ -29,11 +29,12 @@ _debug_*.png
 Screenshot*.png
 awdwad.png
 
-# Local secrets (never commit API keys)
+# Local secrets (never commit API keys / tokens)
 .env
 .env.*
 !.env.example
 config.local.json
+**/secrets.json
 
 # Engines & tablebases (large binaries — download separately)
 engines/stockfish.exe

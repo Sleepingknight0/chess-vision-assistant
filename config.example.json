@@ -9,7 +9,7 @@
   "capture_backend": "mss",
   "auto_recalibrate": false,
   "save_move_screenshots": false,
-  "grok_api_key": "",
+  "grok_api_key_protected": "",
   "grok_model": "grok-4-fast-reasoning",
   "syzygy_path": "",
   "book_path": "",

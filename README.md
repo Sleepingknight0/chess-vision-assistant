@@ -89,6 +89,20 @@ tests/          unit tests (logic only)
 
 ข้อมูลผู้ใช้เก็บที่ `%APPDATA%\ChessVisionAssistant\` (config, profiles, logs, exports)
 
+## ความปลอดภัย (API keys)
+
+- **อย่า**ใส่ API key จริงใน repo / `config.example.json` / commit
+- Grok/xAI key เก็บบนเครื่องแบบ **Windows DPAPI** (`grok_api_key_protected`) — **ไม่**เขียน plain text ลง `config.json`
+- แนะนำตั้งผ่าน environment (ไม่แตะดิสก์ของแอป):
+
+```powershell
+$env:XAI_API_KEY = "xai-..."   # หรือ GROK_API_KEY
+python -m app
+```
+
+- Log / หน้า Diagnostics จะ **redact** รูปแบบ `xai-…` / `Bearer …` อัตโนมัติ
+- Grok ถูกเรียกเฉพาะเมื่อผู้ใช้กดปุ่ม — ส่งเฉพาะ FEN + legal moves (และ Stockfish lines ถ้ามี)
+
 ## License
 
 โค้ดใน repo นี้ใช้ตามที่ระบุใน repository  

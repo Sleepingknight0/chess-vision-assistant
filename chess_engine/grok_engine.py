@@ -17,6 +17,7 @@ from typing import Optional
 import chess
 
 from chess_engine.analysis_types import AnalysisLine, AnalysisResult, EvalScore
+from storage.secret_store import redact_text
 
 
 logger = logging.getLogger(__name__)
@@ -138,6 +139,10 @@ class GrokEngine:
         self.model = model or DEFAULT_GROK_MODEL
         self.base_url = base_url.rstrip("/")
 
+    def __repr__(self) -> str:  # pragma: no cover - safety for logs/debug
+        has = "set" if self.api_key else "empty"
+        return f"GrokEngine(model={self.model!r}, api_key={has}, base_url={self.base_url!r})"
+
     def configure(self, api_key: str, model: str) -> None:
         self.api_key = api_key.strip()
         self.model = model.strip() or DEFAULT_GROK_MODEL
@@ -164,18 +169,22 @@ class GrokEngine:
                 body = exc.read().decode("utf-8", errors="replace")[:300]
             except Exception:  # noqa: BLE001
                 pass
-            logger.warning("xAI HTTP %s: %s", exc.code, body)
+            safe_body = redact_text(body)
+            # Never log Authorization / key material (redacted body only)
+            logger.warning("xAI HTTP %s: %s", exc.code, safe_body)
             if exc.code in (401, 403):
-                raise GrokError("Grok API Key ไม่ถูกต้องหรือหมดอายุ") from exc
+                raise GrokError("Grok API Key ไม่ถูกต้องหรือหมดอายุ") from None
             if exc.code == 404:
                 raise GrokError(
                     f"ไม่พบโมเดล '{self.model}' — กด 'ตรวจสอบ Grok' เพื่อดูรายชื่อโมเดล"
-                ) from exc
-            raise GrokError(f"xAI ตอบกลับผิดพลาด (HTTP {exc.code}): {body}") from exc
+                ) from None
+            raise GrokError(
+                f"xAI ตอบกลับผิดพลาด (HTTP {exc.code}): {safe_body}"
+            ) from None
         except urllib.error.URLError as exc:
-            raise GrokError(f"เชื่อมต่อ xAI ไม่ได้: {exc.reason}") from exc
-        except TimeoutError as exc:
-            raise GrokError("xAI ตอบช้าเกินไป (timeout)") from exc
+            raise GrokError(f"เชื่อมต่อ xAI ไม่ได้: {exc.reason}") from None
+        except TimeoutError:
+            raise GrokError("xAI ตอบช้าเกินไป (timeout)") from None
 
     def validate(self, timeout: float = 15.0) -> tuple[bool, str]:
         """Check key by listing available models (also helps pick a model name)."""

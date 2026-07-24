@@ -49,10 +49,28 @@ from gui.widgets.position_editor import PositionEditorWidget
 from overlay.overlay_window import OverlayWindow
 from overlay.setup_frame import OverlaySetupWindow
 from overlay.toolbar import OverlayToolbar
+from storage.config_store import sanitize_config_dict
 from vision.grid import BoardGrid
 from vision.perspective import PerspectiveCalibration
 
 logger = logging.getLogger(__name__)
+
+
+def _merge_user_config(**updates) -> None:
+    """Update keys in user config.json without ever writing plaintext API keys."""
+    import json
+
+    cfg = config_path()
+    data: dict = {}
+    if cfg.is_file():
+        try:
+            data = json.loads(cfg.read_text(encoding="utf-8"))
+        except Exception:  # noqa: BLE001
+            data = {}
+    data.update(updates)
+    data = sanitize_config_dict(data)
+    user_data_dir().mkdir(parents=True, exist_ok=True)
+    cfg.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
 
 class DeepAnalyzeWorker(QThread):
@@ -1053,17 +1071,9 @@ class GodBoardWindow(QMainWindow):
         if not self._overlay_corners_abs:
             return
         try:
-            import json
-
-            cfg = config_path()
-            data = {}
-            if cfg.is_file():
-                data = json.loads(cfg.read_text(encoding="utf-8"))
-            data["overlay_corners_abs"] = [
-                [x, y] for x, y in self._overlay_corners_abs
-            ]
-            user_data_dir().mkdir(parents=True, exist_ok=True)
-            cfg.write_text(json.dumps(data, indent=2), encoding="utf-8")
+            _merge_user_config(
+                overlay_corners_abs=[[x, y] for x, y in self._overlay_corners_abs]
+            )
         except Exception as exc:  # noqa: BLE001
             logger.warning("save overlay corners: %s", exc)
 
@@ -1241,15 +1251,7 @@ class GodBoardWindow(QMainWindow):
             return
         self.book.set_path(path)
         try:
-            import json
-
-            cfg = config_path()
-            data = {}
-            if cfg.is_file():
-                data = json.loads(cfg.read_text(encoding="utf-8"))
-            data["book_path"] = path
-            user_data_dir().mkdir(parents=True, exist_ok=True)
-            cfg.write_text(json.dumps(data, indent=2), encoding="utf-8")
+            _merge_user_config(book_path=path)
         except Exception as exc:  # noqa: BLE001
             logger.warning("save book path: %s", exc)
         self.lbl_status.setText("ตั้ง Opening Book แล้ว")
@@ -1273,15 +1275,7 @@ class GodBoardWindow(QMainWindow):
         self.engine.set_syzygy_path(folder)
         self._analyzer.invalidate_config()  # re-send SyzygyPath on next search
         try:
-            import json
-
-            cfg = config_path()
-            data = {}
-            if cfg.is_file():
-                data = json.loads(cfg.read_text(encoding="utf-8"))
-            data["syzygy_path"] = folder
-            user_data_dir().mkdir(parents=True, exist_ok=True)
-            cfg.write_text(json.dumps(data, indent=2), encoding="utf-8")
+            _merge_user_config(syzygy_path=folder)
         except Exception as exc:  # noqa: BLE001
             logger.warning("save syzygy path: %s", exc)
         self._refresh_tb_label()
@@ -1300,17 +1294,8 @@ class GodBoardWindow(QMainWindow):
         ok, msg = self.engine.validate()
         self.lbl_status.setText(msg)
         if ok:
-            # save to config
             try:
-                import json
-
-                cfg = config_path()
-                data = {}
-                if cfg.is_file():
-                    data = json.loads(cfg.read_text(encoding="utf-8"))
-                data["stockfish_path"] = path
-                user_data_dir().mkdir(parents=True, exist_ok=True)
-                cfg.write_text(json.dumps(data, indent=2), encoding="utf-8")
+                _merge_user_config(stockfish_path=path)
             except Exception as exc:  # noqa: BLE001
                 logger.warning("save config: %s", exc)
             self._maybe_analyze()

@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Optional
 from PySide6.QtWidgets import QLabel, QPushButton, QTextEdit, QVBoxLayout, QWidget
 
 from app.paths import log_file_path
+from storage.secret_store import redact_text
 
 if TYPE_CHECKING:
     from gui.app_state import AppState
@@ -72,13 +73,20 @@ class DiagnosticsPage(QWidget):
         lines.append(f"Confidence threshold: {self.state.profile.thresholds.confidence}")
         lines.append(f"Debounce ms: {self.state.profile.thresholds.debounce_ms}")
         lines.append(f"Overlay enabled: {self.state.overlay._enabled}")
-        lines.append("Network upload: disabled (local only)")
+        # Never print real API keys — only presence + source
+        src = self.state.config.grok_api_key_source()
+        has_key = bool(self.state.config.get_grok_api_key())
+        # Never show key material (not even partial mask) in diagnostics
+        lines.append(f"Grok API key: {'set' if has_key else 'not set'} (source={src})")
+        lines.append(
+            "Network: local Stockfish by default; Grok only on explicit button"
+        )
         lines.append("Mouse control: disabled (assist only)")
         self.info.setPlainText("\n".join(lines))
 
         path = log_file_path()
         if path.is_file():
             text = path.read_text(encoding="utf-8", errors="replace")
-            self.log_view.setPlainText(text[-12000:])
+            self.log_view.setPlainText(redact_text(text[-12000:]))
         else:
             self.log_view.setPlainText("(no log yet)")

@@ -74,7 +74,7 @@ class AppState(QObject):
         engine_path = self.profile.engine.path or self.config.get("stockfish_path", "")
         self.engine = StockfishEngine(engine_path)
         self.grok = GrokEngine(
-            api_key=str(self.config.get("grok_api_key", "") or ""),
+            api_key=self.config.get_grok_api_key(),
             model=str(self.config.get("grok_model", "") or DEFAULT_GROK_MODEL),
         )
 
