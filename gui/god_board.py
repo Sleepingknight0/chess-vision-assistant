@@ -184,8 +184,8 @@ class GodBoardWindow(QMainWindow):
         layout.setSpacing(8)
 
         sub = QLabel(
-            "คุณอยู่ล่างเสมอ · คู่แข่งอยู่บน\n"
-            "ใส่การเดินคู่แข่งเอง · เดินตามลูกศร Stockfish"
+            "You are always at the bottom · Opponent at the top\n"
+            "Enter opponent moves yourself · Follow Stockfish arrows"
         )
         sub.setAlignment(Qt.AlignmentFlag.AlignCenter)
         sub.setStyleSheet("color:#9aa0a6;")
@@ -194,10 +194,10 @@ class GodBoardWindow(QMainWindow):
 
         # Side select
         side_row = QHBoxLayout()
-        side_row.addWidget(QLabel("ฉันเล่นเป็น:"))
+        side_row.addWidget(QLabel("I play as:"))
         self.side_combo = QComboBox()
-        self.side_combo.addItem("White (Light Cherry) — ล่าง", True)
-        self.side_combo.addItem("Black (Dark Cherry) — ล่าง", False)
+        self.side_combo.addItem("White (Light Cherry) — bottom", True)
+        self.side_combo.addItem("Black (Dark Cherry) — bottom", False)
         self.side_combo.currentIndexChanged.connect(self._on_side_changed)
         side_row.addWidget(self.side_combo, 1)
         layout.addLayout(side_row)
@@ -213,7 +213,7 @@ class GodBoardWindow(QMainWindow):
         self.lbl_turn.setWordWrap(True)
         layout.addWidget(self.lbl_turn)
 
-        self.lbl_status = QLabel("พร้อม")
+        self.lbl_status = QLabel("Ready")
         self.lbl_status.setStyleSheet("color:#a29bfe;")
         self.lbl_status.setWordWrap(True)
         layout.addWidget(self.lbl_status)
@@ -223,13 +223,13 @@ class GodBoardWindow(QMainWindow):
         layout.addWidget(self.lbl_depth)
 
         # Engine suggestion box
-        eng_box = QGroupBox("Stockfish (แรง)")
+        eng_box = QGroupBox("Stockfish (strong)")
         el = QVBoxLayout(eng_box)
-        self.lbl_best = QLabel("🔥 แรงสุด: —")
+        self.lbl_best = QLabel("🔥 Best: —")
         self.lbl_best.setFont(QFont("Segoe UI", 12, QFont.Weight.Bold))
         self.lbl_best.setStyleSheet("color:#2ecc71;")
         self.lbl_best.setWordWrap(True)
-        self.lbl_win = QLabel("⚔️ เอาชนะ: —")
+        self.lbl_win = QLabel("⚔️ Winning line: —")
         self.lbl_win.setFont(QFont("Segoe UI", 12, QFont.Weight.Bold))
         self.lbl_win.setStyleSheet("color:#e67e22;")
         self.lbl_win.setWordWrap(True)
@@ -242,17 +242,17 @@ class GodBoardWindow(QMainWindow):
         el.addWidget(self.lbl_eval)
         el.addWidget(self.lbl_lines)
 
-        btn_apply_best = QPushButton("🔥 เดินแรงสุด")
+        btn_apply_best = QPushButton("🔥 Play best")
         btn_apply_best.setObjectName("primaryButton")
-        btn_apply_best.setToolTip("เดินตาที่แรง/ถูกต้องที่สุด ไร้ที่ติ (PV1)")
+        btn_apply_best.setToolTip("Play the strongest/most accurate move (PV1)")
         btn_apply_best.clicked.connect(self.apply_best)
-        self.btn_apply_win = QPushButton("⚔️ เดินเอาชนะ")
+        self.btn_apply_win = QPushButton("⚔️ Play winning line")
         self.btn_apply_win.setStyleSheet(
             "background:#e67e22; color:#0b1020; font-weight:bold;"
         )
-        self.btn_apply_win.setToolTip("เดินตาที่เน้นเอาชนะ/กดดันคู่แข่ง (PV2)")
+        self.btn_apply_win.setToolTip("Play the win-focused / pressure move (PV2)")
         self.btn_apply_win.clicked.connect(self.apply_win)
-        btn_analyze = QPushButton("วิเคราะห์ใหม่")
+        btn_analyze = QPushButton("Re-analyze")
         btn_analyze.clicked.connect(self.analyze_now)
         row_e = QHBoxLayout()
         row_e.addWidget(btn_apply_best, 1)
@@ -264,16 +264,16 @@ class GodBoardWindow(QMainWindow):
         # Manual UCI
         uci_row = QHBoxLayout()
         self.uci_edit = QLineEdit()
-        self.uci_edit.setPlaceholderText("ใส่การเดิน: e2e4 / Nf3 / O-O")
+        self.uci_edit.setPlaceholderText("Enter move: e2e4 / Nf3 / O-O")
         self.uci_edit.returnPressed.connect(self.apply_text_move)
-        btn_go = QPushButton("ใส่")
+        btn_go = QPushButton("Apply")
         btn_go.clicked.connect(self.apply_text_move)
         uci_row.addWidget(self.uci_edit, 1)
         uci_row.addWidget(btn_go)
         layout.addLayout(uci_row)
 
         # History
-        layout.addWidget(QLabel("ประวัติ"))
+        layout.addWidget(QLabel("History"))
         self.hist = QListWidget()
         self.hist.setMaximumHeight(90)
         layout.addWidget(self.hist)
@@ -282,10 +282,10 @@ class GodBoardWindow(QMainWindow):
         ctrl = QHBoxLayout()
         btn_undo = QPushButton("Undo")
         btn_undo.clicked.connect(self.undo)
-        btn_new = QPushButton("เกมใหม่")
+        btn_new = QPushButton("New game")
         btn_new.clicked.connect(self.new_game)
-        btn_setup = QPushButton("ตั้งค่าหมาก…")
-        btn_setup.setToolTip("ไปหน้าแก้ตำแหน่งเมื่อหมากเพี้ยน")
+        btn_setup = QPushButton("Set up pieces…")
+        btn_setup.setToolTip("Go to the position editor when the board is wrong")
         btn_setup.clicked.connect(lambda: self.tabs.setCurrentIndex(1))
         self.chk_top = QCheckBox("Always on top")
         self.chk_top.setChecked(True)
@@ -298,15 +298,15 @@ class GodBoardWindow(QMainWindow):
 
         # Overlay controls
         ov_row = QHBoxLayout()
-        self.btn_ov = QPushButton("Overlay: ปิด")
-        self.btn_ov.setToolTip("แสดงลูกศร Best Move ซ้อนบนกระดานในเกมจริง")
+        self.btn_ov = QPushButton("Overlay: Off")
+        self.btn_ov.setToolTip("Show Best Move arrows over the real game board")
         self.btn_ov.clicked.connect(self.toggle_overlay)
-        btn_ov_pos = QPushButton("ตั้งตำแหน่ง Overlay")
-        btn_ov_pos.setToolTip("ลากกรอบ 4 มุมให้ตรงกระดานในเกม")
+        btn_ov_pos = QPushButton("Position Overlay")
+        btn_ov_pos.setToolTip("Drag the 4-corner frame to match the in-game board")
         btn_ov_pos.clicked.connect(self.setup_overlay)
-        self.btn_ov_click = QPushButton("คลิก Overlay: ปิด")
+        self.btn_ov_click = QPushButton("Overlay click: Off")
         self.btn_ov_click.setToolTip(
-            "เปิด = คลิกช่องบนเกมจริงเพื่อบันทึกการเดิน (คลิกจะไม่ทะลุไปเกมชั่วคราว)"
+            "On = click squares on the real game to record moves (clicks temporarily won't pass through to the game)"
         )
         self.btn_ov_click.clicked.connect(self.toggle_overlay_click)
         ov_row.addWidget(self.btn_ov, 1)
@@ -316,7 +316,7 @@ class GodBoardWindow(QMainWindow):
 
         # Engine settings — row 1: compute options
         set_row = QHBoxLayout()
-        set_row.addWidget(QLabel("คิด(ms)"))
+        set_row.addWidget(QLabel("Think (ms)"))
         self.spin_time = QSpinBox()
         self.spin_time.setRange(200, 30000)
         self.spin_time.setValue(self.movetime_ms)
@@ -329,18 +329,18 @@ class GodBoardWindow(QMainWindow):
         self.spin_pv.setValue(self.multipv)
         self.spin_pv.valueChanged.connect(lambda v: setattr(self, "multipv", v))
         set_row.addWidget(self.spin_pv)
-        self.chk_max = QCheckBox("แรงสุด")
+        self.chk_max = QCheckBox("Best")
         self.chk_max.setChecked(True)
         self.chk_max.setToolTip(
-            "คิดแบบ PV1 (แรงที่สุด/ลึกสุดต่อการเดินหลัก) — ปิดถ้าอยากเห็น 3 ทางเลือก"
+            "Search PV1 only (strongest/deepest on the main move) — turn off to see 3 alternatives"
         )
         self.chk_max.toggled.connect(lambda _: self.analyze_now())
         set_row.addWidget(self.chk_max)
-        self.chk_winmore = QCheckBox("คู่ขนาน")
+        self.chk_winmore = QCheckBox("Parallel")
         self.chk_winmore.setChecked(True)
         self.chk_winmore.setToolTip(
-            "แสดง 2 ตาพร้อมกัน: 🔥 แรงสุด (PV1 ไร้ที่ติ) และ ⚔️ เอาชนะ (PV2 บุก/"
-            "กดดันคู่แข่ง) — เลือกเดินได้เอง"
+            "Show 2 moves at once: 🔥 Best (PV1 flawless) and ⚔️ Winning line (PV2 aggressive/"
+            "pressure) — pick which to play"
         )
         self.chk_winmore.toggled.connect(lambda _: self._maybe_analyze())
         set_row.addWidget(self.chk_winmore)
@@ -348,15 +348,15 @@ class GodBoardWindow(QMainWindow):
 
         # Engine settings — row 2: opening book / engine / tablebase files
         res_row = QHBoxLayout()
-        self.chk_book = QCheckBox("ตำรา")
+        self.chk_book = QCheckBox("Book")
         self.chk_book.setChecked(True)
         self.chk_book.setToolTip(
-            "เปิด = เดินตามตำราเปิดเกม (ไวและไร้ที่ติ) — ถ้าออกนอกตำราเอนจินคิดเอง"
+            "On = play from the opening book (fast and theory-perfect) — out of book, the engine thinks"
         )
         self.chk_book.toggled.connect(self._on_book_toggled)
         res_row.addWidget(self.chk_book)
         btn_book = QPushButton("Book…")
-        btn_book.setToolTip("เลือกไฟล์ opening book (.bin)")
+        btn_book.setToolTip("Choose opening book file (.bin)")
         btn_book.clicked.connect(self.pick_book)
         res_row.addWidget(btn_book, 1)
         btn_sf = QPushButton("Stockfish…")
@@ -364,7 +364,7 @@ class GodBoardWindow(QMainWindow):
         res_row.addWidget(btn_sf, 1)
         self.btn_tb = QPushButton("Tablebase…")
         self.btn_tb.setToolTip(
-            "เลือกโฟลเดอร์ Syzygy tablebase → เล่นเกมท้ายเป๊ะแบบสมบูรณ์แบบ (ไร้พลาด)"
+            "Choose Syzygy tablebase folder → perfect endgame play (no mistakes)"
         )
         self.btn_tb.clicked.connect(self.pick_tablebase)
         res_row.addWidget(self.btn_tb, 1)
@@ -375,7 +375,7 @@ class GodBoardWindow(QMainWindow):
         self.lbl_tb.setWordWrap(True)
         layout.addWidget(self.lbl_tb)
 
-        self.lbl_click = QLabel("คลิกช่องต้นทาง → ปลายทาง เพื่อบันทึกการเดิน")
+        self.lbl_click = QLabel("Click from-square → to-square to record a move")
         self.lbl_click.setStyleSheet("color:#9aa0a6;")
         self.lbl_click.setWordWrap(True)
         layout.addWidget(self.lbl_click)
@@ -387,16 +387,16 @@ class GodBoardWindow(QMainWindow):
         play_scroll.setHorizontalScrollBarPolicy(
             Qt.ScrollBarPolicy.ScrollBarAlwaysOff
         )
-        self.tabs.addTab(play_scroll, "เล่น")
+        self.tabs.addTab(play_scroll, "Play")
 
         # ── Tab: Setup position ───────────────────────────────────
         setup = QWidget()
         setup_l = QVBoxLayout(setup)
         setup_l.setContentsMargins(4, 4, 4, 4)
         hint = QLabel(
-            "เมื่อเดินผิดจนหมากเพี้ยนทั้งกระดาน — มาหน้านี้\n"
-            "เลือกชนิดหมาก แล้วคลิกช่องเพื่อวาง / เลือกลบหมากเพื่อลบ\n"
-            "ตั้งตาเดิน แล้วกด «ใช้ตำแหน่งนี้»"
+            "When the board is wrong after a bad move — use this page\n"
+            "Pick a piece type, then click a square to place / select erase to remove\n"
+            "Set side to move, then press «Use this position»"
         )
         hint.setObjectName("mutedLabel")
         hint.setWordWrap(True)
@@ -408,21 +408,21 @@ class GodBoardWindow(QMainWindow):
 
         fen_row = QHBoxLayout()
         self.fen_edit = QLineEdit()
-        self.fen_edit.setPlaceholderText("วาง FEN ที่นี่ แล้วกด ใช้ FEN")
-        btn_fen = QPushButton("ใช้ FEN")
+        self.fen_edit.setPlaceholderText("Paste FEN here, then click Apply FEN")
+        btn_fen = QPushButton("Apply FEN")
         btn_fen.clicked.connect(self._apply_fen_from_edit)
         fen_row.addWidget(self.fen_edit, 1)
         fen_row.addWidget(btn_fen)
         setup_l.addLayout(fen_row)
 
         apply_row = QHBoxLayout()
-        btn_load_cur = QPushButton("โหลดตำแหน่งปัจจุบัน")
+        btn_load_cur = QPushButton("Load current position")
         btn_load_cur.clicked.connect(self._load_current_into_editor)
-        btn_apply_pos = QPushButton("ใช้ตำแหน่งนี้")
+        btn_apply_pos = QPushButton("Use this position")
         btn_apply_pos.setObjectName("primaryButton")
-        btn_apply_pos.setToolTip("แทนที่กระดานเล่นด้วยตำแหน่งที่แก้ — ล้างประวัติเดิน")
+        btn_apply_pos.setToolTip("Replace the live board with the edited position — clears move history")
         btn_apply_pos.clicked.connect(self._apply_editor_position)
-        btn_back_play = QPushButton("กลับไปเล่น")
+        btn_back_play = QPushButton("Back to play")
         btn_back_play.clicked.connect(lambda: self.tabs.setCurrentIndex(0))
         apply_row.addWidget(btn_load_cur)
         apply_row.addWidget(btn_apply_pos, 2)
@@ -434,7 +434,7 @@ class GodBoardWindow(QMainWindow):
         self.lbl_setup.setWordWrap(True)
         setup_l.addWidget(self.lbl_setup)
 
-        self.tabs.addTab(setup, "ตั้งค่าหมาก")
+        self.tabs.addTab(setup, "Set up pieces")
         self.tabs.currentChanged.connect(self._on_tab_changed)
 
         self._apply_orientation()
@@ -524,7 +524,7 @@ class GodBoardWindow(QMainWindow):
         self.pos_editor.set_fen(fen)
         self.fen_edit.setText(fen)
         self._apply_orientation()
-        self.lbl_setup.setText("โหลดตำแหน่งจากหน้าเล่นแล้ว — แก้ได้เลย")
+        self.lbl_setup.setText("Loaded position from the Play tab — edit freely")
 
     def _apply_fen_from_edit(self) -> None:
         text = self.fen_edit.text().strip()
@@ -533,10 +533,10 @@ class GodBoardWindow(QMainWindow):
         try:
             chess.Board(text)
         except ValueError as exc:
-            QMessageBox.warning(self, "FEN ไม่ถูกต้อง", str(exc))
+            QMessageBox.warning(self, "Invalid FEN", str(exc))
             return
         self.pos_editor.set_fen(text)
-        self.lbl_setup.setText("ใส่ FEN ในตัวแก้แล้ว — กด «ใช้ตำแหน่งนี้» เพื่อยืนยัน")
+        self.lbl_setup.setText("FEN loaded into the editor — press «Use this position» to confirm")
 
     def _apply_editor_position(self) -> None:
         """Replace live board with edited position (clears move history)."""
@@ -544,14 +544,14 @@ class GodBoardWindow(QMainWindow):
         try:
             board = chess.Board(fen)
         except ValueError as exc:
-            QMessageBox.warning(self, "ตำแหน่งใช้ไม่ได้", str(exc))
+            QMessageBox.warning(self, "Invalid position", str(exc))
             return
         # Soft check: both kings present (common mess after bad edits)
         if board.king(chess.WHITE) is None or board.king(chess.BLACK) is None:
             ans = QMessageBox.question(
                 self,
-                "ไม่มี King ครบ",
-                "กระดานไม่มี King ขาวหรือดำครบ — ยังใช้ตำแหน่งนี้ต่อไหม?",
+                "Missing King",
+                "The board is missing a white or black King — use this position anyway?",
             )
             if ans != QMessageBox.StandardButton.Yes:
                 return
@@ -563,8 +563,8 @@ class GodBoardWindow(QMainWindow):
         self.fen_edit.setText(fen)
         self._refresh_all()
         self.tabs.setCurrentIndex(0)
-        self.lbl_status.setText("ใช้ตำแหน่งที่แก้แล้ว — ประวัติเดินถูกล้าง")
-        self.lbl_setup.setText("ใช้ตำแหน่งนี้แล้ว")
+        self.lbl_status.setText("Applied edited position — move history cleared")
+        self.lbl_setup.setText("Position applied")
         self._maybe_analyze()
 
     def _on_side_changed(self) -> None:
@@ -583,12 +583,12 @@ class GodBoardWindow(QMainWindow):
         self.overlay.set_position(self.board_state.board)
         if self._is_user_turn():
             side = "White" if self.board_state.side_to_move_is_white() else "Black"
-            self.lbl_turn.setText(f"▶ ตาคุณ ({side}) — ดูลูกศร Stockfish แล้วเดินในเกม")
+            self.lbl_turn.setText(f"▶ Your turn ({side}) — follow Stockfish arrows, then move in-game")
             self.lbl_turn.setStyleSheet("color:#2ecc71;")
         else:
             side = "White" if self.board_state.side_to_move_is_white() else "Black"
             self.lbl_turn.setText(
-                f"▶ ตาคู่แข่ง ({side}) อยู่ด้านบน — คลิกเดินที่คู่แข่งเดินในเกม"
+                f"▶ Opponent's turn ({side}) at the top — click the move they played in-game"
             )
             self.lbl_turn.setStyleSheet("color:#f1c40f;")
 
@@ -598,7 +598,7 @@ class GodBoardWindow(QMainWindow):
         ucis = self.board_state.history_uci
         for i, uci in enumerate(ucis):
             san = sans[i] if i < len(sans) else uci
-            who = "คุณ" if self._move_was_user(i) else "คู่แข่ง"
+            who = "You" if self._move_was_user(i) else "Opp"
             self.hist.addItem(f"{i + 1}. [{who}] {san}  ({uci})")
 
         # Auto-cycle: flip opponent-entry mode to match whose turn it is now
@@ -623,18 +623,18 @@ class GodBoardWindow(QMainWindow):
             piece = board.piece_at(chess.parse_square(sq))
             if piece is None or piece.color != board.turn:
                 self.lbl_click.setText(
-                    f"{sq}: ไม่มีหมากฝั่งที่ต้องเดิน — คลิกหมากฝั่ง {'ขาว' if board.turn else 'ดำ'}"
+                    f"{sq}: no piece to move — click a {'white' if board.turn else 'black'} piece"
                 )
                 return
             self._click_from = sq
-            who = "คุณ" if self._is_user_turn() else "คู่แข่ง"
-            self.lbl_click.setText(f"[{who}] ต้นทาง {sq} → คลิกปลายทาง")
+            who = "You" if self._is_user_turn() else "Opp"
+            self.lbl_click.setText(f"[{who}] from {sq} → click destination")
             return
 
         fr = self._click_from
         if sq == fr:
             self._click_from = None  # click same square = deselect
-            self.lbl_click.setText("ยกเลิก — เลือกต้นทางใหม่")
+            self.lbl_click.setText("Cancelled — pick a new origin")
             return
         move = self._parse_move(fr + sq)
         if move is not None:
@@ -647,11 +647,11 @@ class GodBoardWindow(QMainWindow):
         piece = board.piece_at(chess.parse_square(sq))
         if piece is not None and piece.color == board.turn:
             self._click_from = sq
-            who = "คุณ" if self._is_user_turn() else "คู่แข่ง"
-            self.lbl_click.setText(f"[{who}] เลือกใหม่ {sq} → คลิกปลายทาง (จุดเขียว)")
+            who = "You" if self._is_user_turn() else "Opp"
+            self.lbl_click.setText(f"[{who}] reselected {sq} → click destination (green dots)")
             return
         self.lbl_click.setText(
-            f"{fr}→{sq} เดินไม่ได้ — คลิกช่องที่มีจุดเขียว (ต้นทางยังเลือก {fr} อยู่)"
+            f"{fr}→{sq} illegal — click a square with a green dot (origin still {fr})"
         )
 
     def _parse_move(self, text: str) -> Optional[chess.Move]:
@@ -687,7 +687,7 @@ class GodBoardWindow(QMainWindow):
             return
         move = self._parse_move(text)
         if move is None:
-            QMessageBox.warning(self, "เดินไม่ได้", f"ผิดกฎหรือไม่เข้าใจ: {text}")
+            QMessageBox.warning(self, "Illegal move", f"Illegal or not understood: {text}")
             return
         self.uci_edit.clear()
         self._push(move)
@@ -695,26 +695,26 @@ class GodBoardWindow(QMainWindow):
     def apply_best(self) -> None:
         if not self._is_user_turn():
             QMessageBox.information(
-                self, "ยังไม่ใช่ตาคุณ",
-                "ตอนนี้เป็นตาคู่แข่ง — ใส่การเดินของคู่แข่งก่อน (คลิกช่องบนกระดาน)",
+                self, "Not your turn",
+                "It is the opponent's turn — enter their move first (click squares on the board)",
             )
             return
         if not self._last_analysis or not self._last_analysis.ok:
             self.analyze_now()
-            self.lbl_status.setText("กำลังวิเคราะห์… กดอีกครั้งเมื่อได้ Best Move")
+            self.lbl_status.setText("Analyzing… press again when Best Move is ready")
             return
         uci = self._last_analysis.best_move_uci
         move = self._parse_move(uci)
         if move is None:
-            QMessageBox.warning(self, "Error", f"Best move ใช้ไม่ได้: {uci}")
+            QMessageBox.warning(self, "Error", f"Best move not usable: {uci}")
             return
         self._push(move)
 
     def _clear_reco(self) -> None:
         """Reset the recommendation display (both 🔥 best and ⚔️ win)."""
         self._win_move = None
-        self.lbl_best.setText("🔥 แรงสุด: —")
-        self.lbl_win.setText("⚔️ เอาชนะ: —")
+        self.lbl_best.setText("🔥 Best: —")
+        self.lbl_win.setText("⚔️ Winning line: —")
         self.lbl_eval.setText("Eval: —")
         self.lbl_lines.setText("")
         self.btn_apply_win.setEnabled(False)
@@ -723,8 +723,8 @@ class GodBoardWindow(QMainWindow):
         """Play the win-focused move (PV2). Falls back to best if none."""
         if not self._is_user_turn():
             QMessageBox.information(
-                self, "ยังไม่ใช่ตาคุณ",
-                "ตอนนี้เป็นตาคู่แข่ง — ใส่การเดินของคู่แข่งก่อน",
+                self, "Not your turn",
+                "It is the opponent's turn — enter their move first",
             )
             return
         if not self._win_move:
@@ -732,7 +732,7 @@ class GodBoardWindow(QMainWindow):
             return
         move = self._parse_move(self._win_move)
         if move is None:
-            QMessageBox.warning(self, "Error", f"ตาเอาชนะใช้ไม่ได้: {self._win_move}")
+            QMessageBox.warning(self, "Error", f"Winning-line move not usable: {self._win_move}")
             return
         self._push(move)
 
@@ -740,11 +740,11 @@ class GodBoardWindow(QMainWindow):
         try:
             self.board_state.push_move(move)
         except ValueError as exc:
-            QMessageBox.warning(self, "ผิดกฎ", str(exc))
+            QMessageBox.warning(self, "Illegal", str(exc))
             return
         self._click_from = None
         self.overlay.set_selected(None)
-        self.lbl_click.setText(f"บันทึก {move.uci()} แล้ว")
+        self.lbl_click.setText(f"Recorded {move.uci()}")
         self.board_view.clear_arrows()
         self._last_analysis = None
         self._clear_reco()
@@ -760,9 +760,9 @@ class GodBoardWindow(QMainWindow):
             self._update_overlay()
             self._refresh_all()
             self._maybe_analyze()
-            self.lbl_status.setText("Undo แล้ว")
+            self.lbl_status.setText("Undone")
         else:
-            self.lbl_status.setText("ไม่มีให้ Undo")
+            self.lbl_status.setText("Nothing to undo")
 
     def new_game(self) -> None:
         self.board_state.reset_standard()
@@ -772,13 +772,13 @@ class GodBoardWindow(QMainWindow):
         self._update_overlay()
         self._refresh_all()
         self._maybe_analyze()
-        self.lbl_status.setText("เริ่มเกมใหม่")
+        self.lbl_status.setText("New game started")
 
     def _maybe_analyze(self) -> None:
         if self.board_state.board.is_game_over():
             self._analyzer.idle()
             res = self.board_state.board.result()
-            self.lbl_status.setText(f"จบเกม: {res}")
+            self.lbl_status.setText(f"Game over: {res}")
             self.lbl_depth.setText("")
             return
         if self._is_user_turn():
@@ -804,7 +804,7 @@ class GodBoardWindow(QMainWindow):
                 pv_san=[san],
                 score=EvalScore(),
                 depth=0,
-                explanation_th=f"📖 ตำราเปิดเกม (สายที่พิสูจน์แล้ว) — {san}",
+                explanation_th=f"📖 Opening book (theory-proven line) — {san}",
             )
         ]
         result.best_move_uci = move.uci()
@@ -814,9 +814,9 @@ class GodBoardWindow(QMainWindow):
     def _show_book_move(self, move: chess.Move) -> None:
         result = self._book_result(self.board_state.board, move)
         self._on_analysis(result)
-        self.lbl_depth.setText("📖 จากตำราเปิดเกม (เดินได้เลย ไม่ต้องรอคิด)")
+        self.lbl_depth.setText("📖 From opening book (play now — no thinking delay)")
         self.lbl_status.setText(
-            f"ตำรา: {result.best_move_san} — เดินในเกม แล้วกด «เดินตาม Best Move»"
+            f"Book: {result.best_move_san} — play it in-game, then press «Play best»"
         )
 
     def _on_book_toggled(self, on: bool) -> None:
@@ -901,7 +901,7 @@ class GodBoardWindow(QMainWindow):
 
     def analyze_now(self) -> None:
         if not self.engine.path:
-            self.lbl_status.setText("ยังไม่มี Stockfish — กด Stockfish… เพื่อเลือกไฟล์")
+            self.lbl_status.setText("No Stockfish yet — press Stockfish… to choose the binary")
             return
         # Max-strength mode: MultiPV 1 lets Stockfish prune hardest and search
         # deepest on the single best move.
@@ -918,7 +918,7 @@ class GodBoardWindow(QMainWindow):
             self.depth_cap,
         )
         self.lbl_status.setText(
-            f"Stockfish คิด {self.movetime_ms/1000:.1f} วิ แล้วพัก (ไม่หน่วงเครื่อง)…"
+            f"Stockfish thinking {self.movetime_ms/1000:.1f}s then rests (won't peg the CPU)…"
         )
 
     def _ponder(self) -> None:
@@ -946,13 +946,13 @@ class GodBoardWindow(QMainWindow):
                     )
                     self.lbl_depth.setText("")
                     self.lbl_status.setText(
-                        f"คิดล่วงหน้า — เดาคู่แข่งเดิน {board.san(m)} "
-                        "(ถ้าเดาถูกจะตอบได้ลึกทันที)"
+                        f"Pondering — guessing opponent plays {board.san(m)} "
+                        "(if correct, reply is deep instantly)"
                     )
                     return
         self._analyzer.idle()
         self.lbl_depth.setText("")
-        self.lbl_status.setText("รอใส่การเดินของคู่แข่ง (ด้านบน)")
+        self.lbl_status.setText("Waiting for opponent's move (top side)")
 
     def _on_depth(self, depth: int, tbhits: int = 0) -> None:
         self._refresh_engine_status(depth=depth, tbhits=tbhits)
@@ -965,12 +965,12 @@ class GodBoardWindow(QMainWindow):
         ev = a.evaluation
         if ev.mate is not None:
             white_wins = ev.mate > 0
-            return "ชนะแน่นอน 🏆" if white_wins == self.user_is_white else "ต้องป้องกัน (ฝ่ายตรงข้ามชนะได้)"
+            return "Forced win 🏆" if white_wins == self.user_is_white else "Must defend (opponent can win)"
         if ev.cp is not None:
             if ev.cp == 0:
-                return "เสมอแน่นอน (ไม่มีทางชนะ)"
+                return "Forced draw (no winning path)"
             white_better = ev.cp > 0
-            return "ได้เปรียบ" if white_better == self.user_is_white else "เสียเปรียบ"
+            return "Advantage" if white_better == self.user_is_white else "Disadvantage"
         return ""
 
     def _refresh_engine_status(self, depth: Optional[int] = None, tbhits: int = 0) -> None:
@@ -979,20 +979,20 @@ class GodBoardWindow(QMainWindow):
         tb_on = bool(self.engine.syzygy_path)
         if n <= 5:
             if tb_on:
-                base = f"📚 Tablebase ทำงาน · เหลือ {n} หมาก"
+                base = f"📚 Tablebase active · {n} pieces left"
                 v = self._tb_verdict()
                 if v:
                     base += f" · {v}"
                 if tbhits > 0:
-                    base += f" · แตะฐานข้อมูล {tbhits:,} ครั้ง ✓"
+                    base += f" · {tbhits:,} tablebase hits ✓"
             else:
-                base = f"เหลือ {n} หมาก — ยังไม่ได้ตั้ง Tablebase (กดปุ่ม Tablebase…)"
+                base = f"{n} pieces left — Tablebase not set (press Tablebase…)"
         elif n <= 7:
-            base = f"🧠 เอนจิน · เกมท้าย {n} หมาก (Tablebase 5 หมากจะทำงานเมื่อเหลือ ≤5)"
+            base = f"🧠 Engine · endgame {n} pieces (5-piece Tablebase works when ≤5 left)"
         else:
-            base = "🧠 เอนจิน"
+            base = "🧠 Engine"
         if depth is not None:
-            base += f" · ลึก {depth} ply"
+            base += f" · depth {depth} ply"
         self.lbl_depth.setText(base)
 
     def _on_analysis(self, result: AnalysisResult) -> None:
@@ -1021,13 +1021,13 @@ class GodBoardWindow(QMainWindow):
             self._predicted_opp_move = result.lines[0].pv_uci[1]
 
         self.lbl_best.setText(
-            f"🔥 แรงสุด: {result.best_move_san}  ({result.best_move_uci})"
+            f"🔥 Best: {result.best_move_san}  ({result.best_move_uci})"
         )
         if self._win_move:
-            self.lbl_win.setText(f"⚔️ เอาชนะ: {win_san}  ({self._win_move})")
+            self.lbl_win.setText(f"⚔️ Winning line: {win_san}  ({self._win_move})")
             self.btn_apply_win.setEnabled(True)
         else:
-            self.lbl_win.setText("⚔️ เอาชนะ: — (เท่ากับตาแรงสุด)")
+            self.lbl_win.setText("⚔️ Winning line: — (same as Best)")
             self.btn_apply_win.setEnabled(False)
         self.lbl_eval.setText(f"Eval: {result.evaluation.format_display()}")
 
@@ -1045,10 +1045,10 @@ class GodBoardWindow(QMainWindow):
         self.board_view.set_arrows(bview)
         self._update_overlay()
         if self._is_user_turn():
-            extra = f" · ⚔️ เอาชนะ: {win_san}" if self._win_move else ""
-            self.lbl_status.setText(f"🔥 {result.best_move_san}{extra} — เลือกเดินได้")
+            extra = f" · ⚔️ Winning line: {win_san}" if self._win_move else ""
+            self.lbl_status.setText(f"🔥 {result.best_move_san}{extra} — pick a move")
         else:
-            self.lbl_status.setText("วิเคราะห์แล้ว (ยังเป็นตาคู่แข่ง)")
+            self.lbl_status.setText("Analyzed (still opponent's turn)")
 
     # ------------------------------------------------------------------
     # Overlay over the real game
@@ -1090,10 +1090,10 @@ class GodBoardWindow(QMainWindow):
         self._apply_overlay_geometry()
         if not self.overlay._enabled:
             self.overlay.set_enabled(True)
-            self.btn_ov.setText("Overlay: เปิด")
+            self.btn_ov.setText("Overlay: On")
         self._update_overlay()
         self._sync_overlay_toolbar_visibility()
-        self.lbl_status.setText("ตั้งตำแหน่ง Overlay แล้ว — ลูกศรจะขึ้นเมื่อถึงตาคุณ")
+        self.lbl_status.setText("Overlay positioned — arrows appear on your turn")
 
     def _apply_overlay_geometry(self) -> None:
         if not self._overlay_corners_abs:
@@ -1121,7 +1121,7 @@ class GodBoardWindow(QMainWindow):
             self.setup_overlay()
             return
         on = self.overlay.toggle()
-        self.btn_ov.setText("Overlay: เปิด" if on else "Overlay: ปิด")
+        self.btn_ov.setText("Overlay: On" if on else "Overlay: Off")
         if on:
             self._apply_overlay_geometry()
             self._update_overlay()
@@ -1129,7 +1129,7 @@ class GodBoardWindow(QMainWindow):
             # Overlay hidden → click mode off too, for predictability
             self._overlay_click = False
             self.overlay.set_interactive(False)
-            self.btn_ov_click.setText("คลิก Overlay: ปิด")
+            self.btn_ov_click.setText("Overlay click: Off")
         self._sync_overlay_toolbar_visibility()
 
     def toggle_overlay_click(self) -> None:
@@ -1142,19 +1142,19 @@ class GodBoardWindow(QMainWindow):
         self._overlay_click = bool(on)
         if self._overlay_click and not self.overlay._enabled:
             self.overlay.set_enabled(True)
-            self.btn_ov.setText("Overlay: เปิด")
+            self.btn_ov.setText("Overlay: On")
             self._apply_overlay_geometry()
             self._update_overlay()
         self.overlay.set_interactive(self._overlay_click)
         self._sync_overlay_toolbar_visibility()
         self.overlay_toolbar.set_click_mode(self._overlay_click)
         self.btn_ov_click.setText(
-            "คลิก Overlay: เปิด" if self._overlay_click else "คลิก Overlay: ปิด"
+            "Overlay click: On" if self._overlay_click else "Overlay click: Off"
         )
         self.lbl_status.setText(
-            "คลิกช่องบนเกมจริงได้เลย = คลิกกระดานโปรแกรม (ปิดโหมดนี้ก่อนจะคลิกเล่นเกมเอง)"
+            "Click squares on the real game = click the program board (turn this off before clicking the game yourself)"
             if self._overlay_click
-            else "Overlay กลับเป็นแบบคลิกทะลุแล้ว — คลิกเกมได้ปกติ"
+            else "Overlay is click-through again — you can click the game normally"
         )
 
     def toggle_auto_cycle(self) -> None:
@@ -1166,10 +1166,10 @@ class GodBoardWindow(QMainWindow):
         if self._auto_cycle:
             self._apply_auto_cycle()
             self.lbl_status.setText(
-                "วนอัตโนมัติ: เปิด — กด Best Move → ใส่ตาคู่แข่ง → วนกลับเอง"
+                "Auto-cycle: On — press Best Move → enter opponent move → cycles itself"
             )
         else:
-            self.lbl_status.setText("วนอัตโนมัติ: ปิด")
+            self.lbl_status.setText("Auto-cycle: Off")
 
     def _apply_auto_cycle(self) -> None:
         """When on: opponent's turn → click mode on; my turn → click mode off."""
@@ -1182,11 +1182,11 @@ class GodBoardWindow(QMainWindow):
     def _refresh_overlay_toolbar(self) -> None:
         a = self._last_analysis
         if not self._is_user_turn():
-            self.overlay_toolbar.set_best("ตาคู่แข่ง — ใส่การเดินเขาก่อน", False)
+            self.overlay_toolbar.set_best("Opponent's turn — enter their move first", False)
         elif a is not None and a.ok:
             self.overlay_toolbar.set_best(f"🔥 {a.best_move_san}", True)
         else:
-            self.overlay_toolbar.set_best("กำลังคิด…", False)
+            self.overlay_toolbar.set_best("Thinking…", False)
         self.overlay_toolbar.set_win_enabled(
             self._is_user_turn() and self._win_move is not None
         )
@@ -1211,14 +1211,14 @@ class GodBoardWindow(QMainWindow):
         arrows = []
         if len(a.best_move_uci) >= 4:
             arrows.append((a.best_move_uci[0:2], a.best_move_uci[2:4], 0))
-        label = f"🔥 แรงสุด: {a.best_move_san}"
+        label = f"🔥 Best: {a.best_move_san}"
         if self._win_move and len(self._win_move) >= 4:
             arrows.append((self._win_move[0:2], self._win_move[2:4], 4))
             try:
                 wsan = self.board_state.board.san(chess.Move.from_uci(self._win_move))
             except Exception:  # noqa: BLE001
                 wsan = self._win_move
-            label += f"   ⚔️ เอาชนะ: {wsan}"
+            label += f"   ⚔️ Winning line: {wsan}"
         self.overlay.set_arrows(
             arrows,
             label=label,
@@ -1245,7 +1245,7 @@ class GodBoardWindow(QMainWindow):
 
     def pick_book(self) -> None:
         path, _ = QFileDialog.getOpenFileName(
-            self, "เลือก opening book", "", "Polyglot book (*.bin);;All (*.*)"
+            self, "Choose opening book", "", "Polyglot book (*.bin);;All (*.*)"
         )
         if not path:
             return
@@ -1254,20 +1254,20 @@ class GodBoardWindow(QMainWindow):
             _merge_user_config(book_path=path)
         except Exception as exc:  # noqa: BLE001
             logger.warning("save book path: %s", exc)
-        self.lbl_status.setText("ตั้ง Opening Book แล้ว")
+        self.lbl_status.setText("Opening Book set")
         self._maybe_analyze()
 
     def _refresh_tb_label(self) -> None:
-        book = "ตำรา ✓" if self.book.available() else "ตำรา ✗"
+        book = "Book ✓" if self.book.available() else "Book ✗"
         if self.engine.syzygy_path:
-            tb = "Tablebase ✓ (เกมท้ายไร้พลาด)"
+            tb = "Tablebase ✓ (perfect endgames)"
         else:
-            tb = "Tablebase ✗ (ยังไม่ได้ตั้ง)"
+            tb = "Tablebase ✗ (not set)"
         self.lbl_tb.setText(f"{book} · {tb}")
 
     def pick_tablebase(self) -> None:
         folder = QFileDialog.getExistingDirectory(
-            self, "เลือกโฟลเดอร์ Syzygy tablebase (.rtbw/.rtbz)"
+            self, "Choose Syzygy tablebase folder (.rtbw/.rtbz)"
         )
         if not folder:
             return
@@ -1279,12 +1279,12 @@ class GodBoardWindow(QMainWindow):
         except Exception as exc:  # noqa: BLE001
             logger.warning("save syzygy path: %s", exc)
         self._refresh_tb_label()
-        self.lbl_status.setText("ตั้ง Tablebase แล้ว — เกมท้าย ≤7 หมากจะเล่นแบบไร้พลาด")
+        self.lbl_status.setText("Tablebase set — endgames ≤7 pieces play perfectly")
         self._maybe_analyze()
 
     def pick_stockfish(self) -> None:
         path, _ = QFileDialog.getOpenFileName(
-            self, "เลือก stockfish.exe", "", "Executable (*.exe);;All (*.*)"
+            self, "Choose stockfish.exe", "", "Executable (*.exe);;All (*.*)"
         )
         if not path:
             return
@@ -1302,7 +1302,7 @@ class GodBoardWindow(QMainWindow):
 
     def _validate_engine(self) -> None:
         if not self.engine.path:
-            self.lbl_status.setText("เลือก stockfish.exe ก่อน (ปุ่ม Stockfish…)")
+            self.lbl_status.setText("Choose stockfish.exe first (Stockfish… button)")
             return
         ok, msg = self.engine.validate()
         self.lbl_status.setText(msg if ok else msg)

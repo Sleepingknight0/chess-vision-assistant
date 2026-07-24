@@ -49,7 +49,7 @@ class CaptureWorker(QThread):
 
     def set_paused(self, paused: bool) -> None:
         self._paused = paused
-        self.status.emit("หยุดชั่วคราว" if paused else "จับภาพต่อ")
+        self.status.emit("paused" if paused else "capturing")
 
     def stop(self) -> None:
         self._running = False
@@ -59,7 +59,7 @@ class CaptureWorker(QThread):
         cap: Optional[MssCapture] = None
         try:
             cap = MssCapture(self.monitor_id)
-            self.status.emit("เริ่มจับภาพต่อเนื่อง")
+            self.status.emit("continuous capture started")
             interval = 1.0 / self.target_fps
             while self._running:
                 t0 = time.perf_counter()
@@ -72,7 +72,7 @@ class CaptureWorker(QThread):
                 mon = self.monitor_id
                 self._mutex.unlock()
                 if region is None or cal is None:
-                    self.error.emit("ยังไม่ได้ตั้ง ROI / Calibration")
+                    self.error.emit("ROI / Calibration not set")
                     time.sleep(0.5)
                     continue
                 try:
@@ -84,7 +84,7 @@ class CaptureWorker(QThread):
                     self.frame_ready.emit(roi, warped)
                 except Exception as exc:  # noqa: BLE001
                     logger.exception("capture frame failed")
-                    self.error.emit(f"จับภาพผิดพลาด: {exc}")
+                    self.error.emit(f"Capture error: {exc}")
                     time.sleep(0.3)
                 elapsed = time.perf_counter() - t0
                 sleep_for = interval - elapsed
@@ -95,4 +95,4 @@ class CaptureWorker(QThread):
         finally:
             if cap is not None:
                 cap.close()
-            self.status.emit("หยุดจับภาพแล้ว")
+            self.status.emit("capture stopped")

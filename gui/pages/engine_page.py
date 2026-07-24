@@ -40,11 +40,11 @@ class EnginePage(QWidget):
         title.setObjectName("titleLabel")
 
         self.path_edit = QLineEdit(state.engine.path or state.config.get("stockfish_path", ""))
-        btn_browse = QPushButton("เลือก stockfish.exe…")
+        btn_browse = QPushButton("Choose stockfish.exe…")
         btn_browse.clicked.connect(self.browse)
-        btn_validate = QPushButton("ตรวจสอบ Engine")
+        btn_validate = QPushButton("Validate Engine")
         btn_validate.clicked.connect(self.validate)
-        self.lbl_engine_status = QLabel("ยังไม่ได้ตรวจสอบ")
+        self.lbl_engine_status = QLabel("Not validated yet")
         self.lbl_engine_status.setObjectName("mutedLabel")
 
         path_row = QHBoxLayout()
@@ -77,21 +77,21 @@ class EnginePage(QWidget):
         self.movetime.setValue(state.profile.engine.movetime_ms)
 
         form = QFormLayout()
-        form.addRow("ระดับวิเคราะห์", self.preset)
+        form.addRow("Analysis level", self.preset)
         form.addRow("Top lines (MultiPV)", self.multipv)
         form.addRow("CPU Threads", self.threads)
         form.addRow("Skill Level", self.skill)
         form.addRow("Move Time", self.movetime)
 
-        btn_analyze = QPushButton("วิเคราะห์ตำแหน่งปัจจุบัน")
+        btn_analyze = QPushButton("Analyze current position")
         btn_analyze.setObjectName("primaryButton")
         btn_analyze.clicked.connect(self.analyze)
-        btn_save = QPushButton("บันทึกการตั้งค่า Engine")
+        btn_save = QPushButton("Save Engine settings")
         btn_save.clicked.connect(self.save_settings)
 
         self.output = QTextEdit()
         self.output.setReadOnly(True)
-        self.output.setPlaceholderText("ผลวิเคราะห์จะแสดงที่นี่…")
+        self.output.setPlaceholderText("Analysis results will appear here…")
 
         box = QGroupBox("Stockfish (local UCI)")
         bl = QVBoxLayout(box)
@@ -108,32 +108,32 @@ class EnginePage(QWidget):
         self.grok_key.setEchoMode(QLineEdit.EchoMode.Password)
         src = self.state.config.grok_api_key_source()
         if src == "env":
-            self.grok_key.setPlaceholderText("ใช้จาก environment (XAI_API_KEY) — ไม่เขียนลงดิสก์")
+            self.grok_key.setPlaceholderText("Using environment (XAI_API_KEY) — not written to disk")
         elif src in ("protected", "legacy"):
-            self.grok_key.setPlaceholderText("บันทึกไว้แล้ว (เข้ารหัส DPAPI) — ใส่ใหม่เพื่อเปลี่ยน")
+            self.grok_key.setPlaceholderText("Saved (DPAPI encrypted) — enter a new key to change")
         else:
-            self.grok_key.setPlaceholderText("xai-… หรือตั้ง XAI_API_KEY ใน environment")
+            self.grok_key.setPlaceholderText("xai-… or set XAI_API_KEY in the environment")
         self.grok_model = QLineEdit(state.grok.model)
-        btn_grok_validate = QPushButton("ตรวจสอบ Grok")
+        btn_grok_validate = QPushButton("Validate Grok")
         btn_grok_validate.clicked.connect(self.validate_grok)
-        self.btn_grok_analyze = QPushButton("ให้ Grok วิเคราะห์ตำแหน่งนี้")
+        self.btn_grok_analyze = QPushButton("Analyze this position with Grok")
         self.btn_grok_analyze.setObjectName("primaryButton")
         self.btn_grok_analyze.clicked.connect(self.analyze_grok)
-        btn_clear_key = QPushButton("ลบ Key ที่บันทึก")
+        btn_clear_key = QPushButton("Clear saved Key")
         btn_clear_key.clicked.connect(self.clear_grok_key)
-        self.lbl_grok_status = QLabel("ยังไม่ได้ตรวจสอบ")
+        self.lbl_grok_status = QLabel("Not validated yet")
         self.lbl_grok_status.setObjectName("mutedLabel")
         self.lbl_grok_status.setWordWrap(True)
 
         grok_form = QFormLayout()
         grok_form.addRow("API Key", self.grok_key)
-        grok_form.addRow("โมเดล", self.grok_model)
+        grok_form.addRow("Model", self.grok_model)
         grok_btns = QHBoxLayout()
         grok_btns.addWidget(btn_grok_validate)
         grok_btns.addWidget(btn_clear_key)
         grok_btns.addWidget(self.btn_grok_analyze, 1)
 
-        grok_box = QGroupBox("Grok (xAI API — ตัวเลือกเสริม)")
+        grok_box = QGroupBox("Grok (xAI API — optional)")
         gl = QVBoxLayout(grok_box)
         gl.addLayout(grok_form)
         gl.addLayout(grok_btns)
@@ -143,12 +143,12 @@ class EnginePage(QWidget):
         layout.addWidget(title)
         layout.addWidget(box)
         layout.addWidget(grok_box)
-        layout.addWidget(QLabel("ผลลัพธ์"))
+        layout.addWidget(QLabel("Results"))
         layout.addWidget(self.output, 1)
 
         note = QLabel(
-            "Stockfish วิเคราะห์บนเครื่องคุณเท่านั้น — ถ้าใช้ Grok โปรแกรมจะส่งเฉพาะ FEN "
-            "ของตำแหน่งไปยัง xAI เมื่อคุณกดปุ่มเท่านั้น และไม่เดินหมากแทนคุณ"
+            "Stockfish analyzes only on your machine — if you use Grok, the app sends only the "
+            "position FEN to xAI when you press the button, and never moves pieces for you"
         )
         note.setObjectName("mutedLabel")
         note.setWordWrap(True)
@@ -157,7 +157,7 @@ class EnginePage(QWidget):
     def browse(self) -> None:
         path, _ = QFileDialog.getOpenFileName(
             self,
-            "เลือก stockfish.exe",
+            "Choose stockfish.exe",
             "",
             "Executable (*.exe);;All files (*.*)",
         )
@@ -191,7 +191,7 @@ class EnginePage(QWidget):
         self._apply_grok_settings()
         self.state.config.save()
         self.state.save_profile()
-        self.state.status_message.emit("บันทึกการตั้งค่า Engine แล้ว")
+        self.state.status_message.emit("Engine settings saved")
 
     def _apply_grok_settings(self) -> None:
         typed = self.grok_key.text().strip()
@@ -200,7 +200,7 @@ class EnginePage(QWidget):
             self.state.config.set_grok_api_key(typed)
             self.grok_key.clear()
             self.grok_key.setPlaceholderText(
-                "บันทึกไว้แล้ว (เข้ารหัส DPAPI) — ใส่ใหม่เพื่อเปลี่ยน"
+                "Saved (DPAPI encrypted) — enter a new key to change"
             )
         # Reload resolved key (env > protected)
         key = self.state.config.get_grok_api_key()
@@ -217,21 +217,21 @@ class EnginePage(QWidget):
         src = self.state.config.grok_api_key_source()
         if src == "env":
             self.lbl_grok_status.setText(
-                "ลบ key บนดิสก์แล้ว — ยังใช้ได้จาก environment variable"
+                "Cleared key on disk — still available from environment variable"
             )
             self.grok_key.setPlaceholderText(
-                "ใช้จาก environment (XAI_API_KEY) — ไม่เขียนลงดิสก์"
+                "Using environment (XAI_API_KEY) — not written to disk"
             )
             self.state.grok.configure(self.state.config.get_grok_api_key(), self.grok_model.text())
         else:
-            self.lbl_grok_status.setText("ลบ API key ที่บันทึกแล้ว")
-            self.grok_key.setPlaceholderText("xai-… หรือตั้ง XAI_API_KEY ใน environment")
-        self.state.status_message.emit("ลบ Grok API key แล้ว")
+            self.lbl_grok_status.setText("Saved API key cleared")
+            self.grok_key.setPlaceholderText("xai-… or set XAI_API_KEY in the environment")
+        self.state.status_message.emit("Grok API key cleared")
 
     def validate_grok(self) -> None:
         self._apply_grok_settings()
         self.state.config.save()
-        self.lbl_grok_status.setText("กำลังตรวจสอบ…")
+        self.lbl_grok_status.setText("Validating…")
         self._grok_validate_worker = GrokValidateWorker(self.state)
         self._grok_validate_worker.done.connect(self._on_grok_validated)
         self._grok_validate_worker.start()
@@ -247,7 +247,7 @@ class EnginePage(QWidget):
         self._apply_grok_settings()
         self.state.config.save()
         self.btn_grok_analyze.setEnabled(False)
-        self.output.setPlainText(f"กำลังถาม Grok ({self.state.grok.model})…")
+        self.output.setPlainText(f"Asking Grok ({self.state.grok.model})…")
         self._grok_worker = GrokWorker(self.state)
         self._grok_worker.finished_ok.connect(self._on_grok_result)
         self._grok_worker.failed.connect(self._on_grok_fail)
@@ -257,7 +257,7 @@ class EnginePage(QWidget):
         self.btn_grok_analyze.setEnabled(True)
         if result.error:
             self.output.setPlainText(result.error)
-            self.state.status_message.emit("Grok วิเคราะห์ไม่สำเร็จ")
+            self.state.status_message.emit("Grok analysis failed")
             return
         self.state.last_analysis = result
         self.state.analysis_changed.emit()
@@ -278,11 +278,11 @@ class EnginePage(QWidget):
     def _on_grok_fail(self, msg: str) -> None:
         self.btn_grok_analyze.setEnabled(True)
         self.output.setPlainText(msg)
-        QMessageBox.warning(self, "Grok วิเคราะห์ล้มเหลว", msg)
+        QMessageBox.warning(self, "Grok analysis failed", msg)
 
     def analyze(self) -> None:
         self.save_settings()
-        self.output.setPlainText("กำลังวิเคราะห์…")
+        self.output.setPlainText("Analyzing…")
         self._worker = AnalyzeWorker(self.state)
         self._worker.finished_ok.connect(self._on_result)
         self._worker.failed.connect(self._on_fail)
@@ -313,4 +313,4 @@ class EnginePage(QWidget):
 
     def _on_fail(self, msg: str) -> None:
         self.output.setPlainText(msg)
-        QMessageBox.warning(self, "วิเคราะห์ล้มเหลว", msg)
+        QMessageBox.warning(self, "Analysis failed", msg)

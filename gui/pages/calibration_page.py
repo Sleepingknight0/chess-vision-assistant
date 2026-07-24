@@ -45,11 +45,11 @@ class CalibrationPage(QWidget):
         self._reload_monitors()
         self.monitor_combo.currentIndexChanged.connect(self._on_monitor)
 
-        btn_region = QPushButton("เลือกพื้นที่กระดาน")
+        btn_region = QPushButton("Select board region")
         btn_region.setObjectName("primaryButton")
         btn_region.clicked.connect(self.select_region)
 
-        btn_snap = QPushButton("จับภาพ ROI")
+        btn_snap = QPushButton("Capture ROI")
         btn_snap.clicked.connect(self.grab_roi)
 
         self.warped_size = QSpinBox()
@@ -57,7 +57,7 @@ class CalibrationPage(QWidget):
         self.warped_size.setSingleStep(64)
         self.warped_size.setValue(state.calibration.warped_size)
 
-        self.chk_grid = QCheckBox("แสดง Grid 8×8")
+        self.chk_grid = QCheckBox("Show Grid 8×8")
         self.chk_grid.setChecked(True)
 
         self.orient_combo = QComboBox()
@@ -67,14 +67,14 @@ class CalibrationPage(QWidget):
         self.side_combo = QComboBox()
         self.side_combo.addItems(
             [
-                f"ฉันเล่นเป็น Light Cherry (White)",
-                f"ฉันเล่นเป็น Dark Cherry (Black)",
+                f"I play as Light Cherry (White)",
+                f"I play as Dark Cherry (Black)",
             ]
         )
         self.side_combo.setCurrentIndex(0 if state.team.user_is_white else 1)
 
         self.bottom_combo = QComboBox()
-        self.bottom_combo.addItems(["หมากของฉันอยู่ด้านล่างจอ", "หมากของฉันอยู่ด้านบนจอ"])
+        self.bottom_combo.addItems(["My pieces are at the bottom of the screen", "My pieces are at the top of the screen"])
         self.bottom_combo.setCurrentIndex(0 if state.orientation.my_pieces_at_bottom else 1)
 
         self.white_name = QComboBox()
@@ -87,17 +87,17 @@ class CalibrationPage(QWidget):
         self.black_name.addItems(["Dark Cherry", "Blue Team", "Black"])
         self.black_name.setCurrentText(state.team.black_label)
 
-        btn_apply_setup = QPushButton("ใช้การตั้งค่าฝ่าย/มุม")
+        btn_apply_setup = QPushButton("Apply side/orientation")
         btn_apply_setup.clicked.connect(self.apply_setup)
 
-        btn_warp = QPushButton("อัปเดต Perspective Preview")
+        btn_warp = QPushButton("Update Perspective Preview")
         btn_warp.setObjectName("primaryButton")
         btn_warp.clicked.connect(self.update_warp)
 
-        btn_save = QPushButton("บันทึก Profile")
+        btn_save = QPushButton("Save Profile")
         btn_save.clicked.connect(self.save_profile)
 
-        self.chk_auto_recal = QCheckBox("เปิด Auto Recalibration (ถ้าจับขอบกระดานได้มั่นใจ)")
+        self.chk_auto_recal = QCheckBox("Enable Auto Recalibration (when board edges are detected confidently)")
         self.chk_auto_recal.setChecked(state.auto_recalibrate)
         self.chk_auto_recal.toggled.connect(self._on_auto_recal)
 
@@ -111,7 +111,7 @@ class CalibrationPage(QWidget):
 
         self.corner_editor.corners_changed.connect(lambda _: self.update_warp())
 
-        controls = QGroupBox("จอ / ROI / ฝ่าย")
+        controls = QGroupBox("Monitor / ROI / Side")
         cl = QVBoxLayout(controls)
         row1 = QHBoxLayout()
         row1.addWidget(QLabel("Monitor:"))
@@ -123,7 +123,7 @@ class CalibrationPage(QWidget):
         row2.addWidget(QLabel("Warped size:"))
         row2.addWidget(self.warped_size)
         row2.addWidget(self.chk_grid)
-        row2.addWidget(QLabel("หมุน:"))
+        row2.addWidget(QLabel("Rotation:"))
         row2.addWidget(self.orient_combo)
         cl.addLayout(row2)
         row3 = QHBoxLayout()
@@ -131,9 +131,9 @@ class CalibrationPage(QWidget):
         row3.addWidget(self.bottom_combo, 1)
         cl.addLayout(row3)
         row4 = QHBoxLayout()
-        row4.addWidget(QLabel("ชื่อฝ่าย White:"))
+        row4.addWidget(QLabel("White side name:"))
         row4.addWidget(self.white_name, 1)
-        row4.addWidget(QLabel("ชื่อฝ่าย Black:"))
+        row4.addWidget(QLabel("Black side name:"))
         row4.addWidget(self.black_name, 1)
         row4.addWidget(btn_apply_setup)
         cl.addLayout(row4)
@@ -145,10 +145,10 @@ class CalibrationPage(QWidget):
 
         previews = QHBoxLayout()
         left = QVBoxLayout()
-        left.addWidget(QLabel("ปรับ 4 มุมบนภาพ ROI"))
+        left.addWidget(QLabel("Adjust 4 corners on the ROI image"))
         left.addWidget(self.corner_editor, 1)
         right = QVBoxLayout()
-        right.addWidget(QLabel("Preview หลัง Perspective + Grid 64 ช่อง"))
+        right.addWidget(QLabel("Preview after Perspective + Grid 64 squares"))
         right.addWidget(self.warp_preview, 1)
         previews.addLayout(left, 1)
         previews.addLayout(right, 1)
@@ -159,8 +159,8 @@ class CalibrationPage(QWidget):
         layout.addLayout(previews, 1)
 
         hint = QLabel(
-            "ลากจุดสีทั้ง 4 ให้ตรงมุมกระดานจริง (ซ้ายบน → ขวาบน → ขวาล่าง → ซ้ายล่าง) "
-            "จากนั้นกดอัปเดต Preview — ตัด UI Roblox และท้องฟ้าออกจาก ROI"
+            "Drag the 4 colored points to the real board corners (top-left → top-right → bottom-right → bottom-left) "
+            "then update Preview — crop Roblox UI and sky out of the ROI"
         )
         hint.setObjectName("mutedLabel")
         hint.setWordWrap(True)
@@ -194,19 +194,19 @@ class CalibrationPage(QWidget):
 
         self._selector = RegionSelector(geo)
         self._selector.region_selected.connect(self._on_region)
-        self._selector.cancelled.connect(lambda: self.state.status_message.emit("ยกเลิกเลือกพื้นที่"))
+        self._selector.cancelled.connect(lambda: self.state.status_message.emit("Region selection cancelled"))
         self._selector.show()
 
     def _on_region(self, region: CaptureRegion) -> None:
         self.state.region = region
         self.state.status_message.emit(
-            f"เลือกพื้นที่ {region.width}×{region.height} @ ({region.left},{region.top})"
+            f"Selected region {region.width}×{region.height} @ ({region.left},{region.top})"
         )
         self.grab_roi()
 
     def grab_roi(self) -> None:
         if self.state.region is None:
-            QMessageBox.information(self, "ยังไม่มี ROI", "กด «เลือกพื้นที่กระดาน» ก่อน")
+            QMessageBox.information(self, "No ROI yet", "Press «Select board region» first")
             return
         try:
             cap = MssCapture(self.state.monitor_id)
@@ -222,9 +222,9 @@ class CalibrationPage(QWidget):
             if any(x < 0 or y < 0 or x >= w or y >= h for x, y in corners):
                 self.corner_editor.set_corners(default_corners(float(w), float(h)))
             self.update_warp()
-            self.state.status_message.emit("จับภาพ ROI สำเร็จ")
+            self.state.status_message.emit("ROI capture successful")
         except Exception as exc:  # noqa: BLE001
-            QMessageBox.critical(self, "จับภาพไม่สำเร็จ", str(exc))
+            QMessageBox.critical(self, "Capture failed", str(exc))
 
     def apply_setup(self) -> None:
         self.state.team.user_is_white = self.side_combo.currentIndex() == 0
@@ -237,7 +237,7 @@ class CalibrationPage(QWidget):
         self.state.profile_changed.emit()
         self.state.board_changed.emit()
         self.state.status_message.emit(
-            f"ฝ่าย: {self.state.team.user_label()} / หมุน {rot}°"
+            f"Side: {self.state.team.user_label()} / rotation {rot}°"
         )
 
     def update_warp(self) -> None:
@@ -258,7 +258,7 @@ class CalibrationPage(QWidget):
             self.warp_preview.set_image(warped)
             self.state.capture_changed.emit()
         except Exception as exc:  # noqa: BLE001
-            QMessageBox.warning(self, "Perspective ล้มเหลว", str(exc))
+            QMessageBox.warning(self, "Perspective failed", str(exc))
 
     def _on_auto_recal(self, on: bool) -> None:
         self.state.auto_recalibrate = on
@@ -275,4 +275,4 @@ class CalibrationPage(QWidget):
         if self.state.last_warped_bgr is not None:
             self.state.detection.set_reference_frame(self.state.last_warped_bgr)
         self.state.update_overlay_geometry()
-        QMessageBox.information(self, "บันทึกแล้ว", f"บันทึก Profile «{self.state.profile.name}» แล้ว")
+        QMessageBox.information(self, "Saved", f"Profile «{self.state.profile.name}» saved")

@@ -26,7 +26,7 @@ Point = tuple[float, float]
 
 HANDLE_RADIUS = 10.0
 HANDLE_HIT = 22.0
-CORNER_LABELS = ("1 ซ้ายบน", "2 ขวาบน", "3 ขวาล่าง", "4 ซ้ายล่าง")
+CORNER_LABELS = ("1 top-left", "2 top-right", "3 bottom-right", "4 bottom-left")
 
 
 def _virtual_desktop_rect() -> QRect:
@@ -47,7 +47,7 @@ class OverlaySetupWindow(QWidget):
 
     def __init__(self, initial_corners_abs: Optional[list[Point]] = None) -> None:
         super().__init__()
-        self.setWindowTitle("ตั้งตำแหน่ง Overlay")
+        self.setWindowTitle("Position Overlay")
         self.setWindowFlags(
             Qt.WindowType.FramelessWindowHint
             | Qt.WindowType.WindowStaysOnTopHint
@@ -88,16 +88,16 @@ class OverlaySetupWindow(QWidget):
         )
         pl = QVBoxLayout(panel)
         info = QLabel(
-            "ลากมุม 1–4 ให้ตรงมุมกระดานในเกม (ผิวกระดาน ไม่ใช่ขอบไม้)\n"
-            "ลากกลางกรอบ = ย้ายทั้งกรอบ · Enter = ยืนยัน · Esc = ยกเลิก"
+            "Drag corners 1–4 onto the in-game board corners (board surface, not the wood frame)\n"
+            "Drag the frame center = move whole frame · Enter = confirm · Esc = cancel"
         )
         info.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pl.addWidget(info)
         btns = QHBoxLayout()
-        ok = QPushButton("ยืนยัน (Enter)")
+        ok = QPushButton("Confirm (Enter)")
         ok.setDefault(True)
         ok.clicked.connect(self._confirm)
-        cancel = QPushButton("ยกเลิก (Esc)")
+        cancel = QPushButton("Cancel (Esc)")
         cancel.clicked.connect(self._cancel)
         btns.addWidget(ok)
         btns.addWidget(cancel)

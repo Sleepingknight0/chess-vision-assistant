@@ -28,15 +28,15 @@ class DiagnosticsPage(QWidget):
         self.log_view = QTextEdit()
         self.log_view.setReadOnly(True)
 
-        btn = QPushButton("รีเฟรช")
+        btn = QPushButton("Refresh")
         btn.clicked.connect(self.refresh)
 
         layout = QVBoxLayout(self)
         layout.addWidget(title)
         layout.addWidget(btn)
-        layout.addWidget(QLabel("ระบบ"))
+        layout.addWidget(QLabel("System"))
         layout.addWidget(self.info)
-        layout.addWidget(QLabel("Log (ท้ายไฟล์)"))
+        layout.addWidget(QLabel("Log (file tail)"))
         layout.addWidget(self.log_view, 1)
         self.refresh()
 

@@ -52,7 +52,7 @@ class RegionSelector(QWidget):
             painter.drawText(
                 self.rect(),
                 Qt.AlignmentFlag.AlignCenter,
-                "ลากกรอบครอบกระดานหมากรุก — ESC ยกเลิก",
+                "Drag a box around the chessboard — ESC to cancel",
             )
         painter.end()
 

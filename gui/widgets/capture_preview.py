@@ -26,7 +26,7 @@ def bgr_to_qpixmap(bgr: np.ndarray) -> QPixmap:
 class CapturePreview(QWidget):
     def __init__(self, parent: Optional[QWidget] = None) -> None:
         super().__init__(parent)
-        self._label = QLabel("ยังไม่มีภาพ")
+        self._label = QLabel("No image yet")
         self._label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self._label.setMinimumSize(240, 240)
         self._label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
@@ -61,7 +61,7 @@ class CapturePreview(QWidget):
     def _refresh(self) -> None:
         if self._image is None:
             self._label.setPixmap(QPixmap())
-            self._label.setText("ยังไม่มีภาพ")
+            self._label.setText("No image yet")
             return
         img = self._image.copy()
         h, w = img.shape[:2]

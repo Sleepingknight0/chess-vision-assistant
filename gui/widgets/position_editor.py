@@ -19,7 +19,7 @@ from gui.widgets.board_view import BoardView
 
 
 PIECE_CHOICES = [
-    ("ลบหมาก", None),
+    ("Remove piece", None),
     ("♙ Pawn White", "P"),
     ("♘ Knight White", "N"),
     ("♗ Bishop White", "B"),
@@ -50,22 +50,22 @@ class PositionEditorWidget(QWidget):
             self.piece_combo.addItem(label)
 
         self.turn_combo = QComboBox()
-        self.turn_combo.addItems(["ตา White (Light Cherry)", "ตา Black (Dark Cherry)"])
+        self.turn_combo.addItems(["White to move (Light Cherry)", "Black to move (Dark Cherry)"])
         self.turn_combo.currentIndexChanged.connect(self._on_turn)
 
-        btn_standard = QPushButton("ตำแหน่งมาตรฐาน")
+        btn_standard = QPushButton("Standard position")
         btn_standard.clicked.connect(self.load_standard)
-        btn_clear = QPushButton("ล้างกระดาน")
+        btn_clear = QPushButton("Clear board")
         btn_clear.clicked.connect(self.clear_board)
         btn_copy = QPushButton("Copy FEN")
         btn_copy.clicked.connect(self.copy_fen)
 
         tools = QHBoxLayout()
-        tools.addWidget(QLabel("วางหมาก:"))
+        tools.addWidget(QLabel("Place piece:"))
         tools.addWidget(self.piece_combo, 1)
 
         tools2 = QHBoxLayout()
-        tools2.addWidget(QLabel("ตาเดิน:"))
+        tools2.addWidget(QLabel("Side to move:"))
         tools2.addWidget(self.turn_combo, 1)
         tools2.addWidget(btn_standard)
         tools2.addWidget(btn_clear)
@@ -75,7 +75,7 @@ class PositionEditorWidget(QWidget):
         layout.addLayout(tools)
         layout.addLayout(tools2)
         layout.addWidget(self.board_view, 1)
-        tip = QLabel("คลิกช่อง = วางหมากที่เลือก · เลือกลบหมากแล้วคลิก = ลบ")
+        tip = QLabel("Click a square = place selected piece · choose Remove piece then click = delete")
         tip.setStyleSheet("color:#9aa0a6;")
         tip.setWordWrap(True)
         layout.addWidget(tip)

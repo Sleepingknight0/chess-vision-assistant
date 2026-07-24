@@ -1,11 +1,11 @@
 # Engines (not in git)
 
-โฟลเดอร์นี้เก็บไฟล์ใหญ่ที่**ไม่ commit** ลง GitHub
+This folder holds large files that are **not committed** to GitHub.
 
-| ไฟล์ / โฟลเดอร์ | วิธีได้ |
-|------------------|---------|
-| `stockfish.exe` | ดาวน์โหลดจาก [stockfishchess.org](https://stockfishchess.org/download/) แล้ววางที่นี่ หรือกดปุ่ม **Stockfish…** ในแอป |
-| `books/komodo.bin` (หรือ book อื่น) | ใส่ไฟล์ polyglot book แล้วชี้ path ในแอป (**Book…**) |
-| `syzygy/` | ตารางจบเกม 3–5 หมาก: `python tools/download_syzygy_345.py` |
+| File / folder | How to obtain |
+|---------------|---------------|
+| `stockfish.exe` | Download from [stockfishchess.org](https://stockfishchess.org/download/) and place it here, or use the **Stockfish…** button in the app |
+| `books/komodo.bin` (or another book) | Add a polyglot book file and point to its path in the app (**Book…**) |
+| `syzygy/` | 3–5 piece endgame tablebases: `python tools/download_syzygy_345.py` |
 
-ดูรายละเอียดเพิ่ม: `scripts/download_stockfish_note.md`
+See also: `scripts/download_stockfish_note.md`

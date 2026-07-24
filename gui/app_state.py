@@ -153,7 +153,7 @@ class AppState(QObject):
         self.config.set("auto_recalibrate", self.auto_recalibrate)
         self.config.set("save_move_screenshots", self.save_move_screenshots)
         self.config.save()
-        self.status_message.emit(f"บันทึก Profile: {self.profile.name}")
+        self.status_message.emit(f"Saved Profile: {self.profile.name}")
 
     def update_overlay_geometry(self) -> None:
         if self.region is None:

@@ -38,7 +38,7 @@ class ProfileManager:
     def load(self, name: str) -> Profile:
         path = self.path_for(name)
         if not path.is_file():
-            raise FileNotFoundError(f"ไม่พบ Profile: {name}")
+            raise FileNotFoundError(f"Profile not found: {name}")
         data = json.loads(path.read_text(encoding="utf-8"))
         return Profile.from_dict(data)
 

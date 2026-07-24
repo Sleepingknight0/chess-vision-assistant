@@ -31,16 +31,16 @@ class ProfilesPage(QWidget):
 
         self.list = QListWidget()
         self.name_edit = QLineEdit()
-        self.name_edit.setPlaceholderText("ชื่อ Profile ใหม่")
+        self.name_edit.setPlaceholderText("New Profile name")
 
-        btn_refresh = QPushButton("รีเฟรช")
+        btn_refresh = QPushButton("Refresh")
         btn_refresh.clicked.connect(self.refresh)
-        btn_load = QPushButton("โหลดที่เลือก")
+        btn_load = QPushButton("Load selected")
         btn_load.clicked.connect(self.load_selected)
-        btn_save = QPushButton("บันทึกปัจจุบัน")
+        btn_save = QPushButton("Save current")
         btn_save.setObjectName("primaryButton")
         btn_save.clicked.connect(self.save_current)
-        btn_new = QPushButton("สร้างใหม่จากปัจจุบัน")
+        btn_new = QPushButton("Create new from current")
         btn_new.clicked.connect(self.create_new)
 
         row = QHBoxLayout()
@@ -53,7 +53,7 @@ class ProfilesPage(QWidget):
         layout = QVBoxLayout(self)
         layout.addWidget(title)
         layout.addWidget(
-            QLabel("แต่ละ Profile เก็บ ROI, มุม 4 จุด, ฝ่าย, orientation, engine, thresholds")
+            QLabel("Each Profile stores ROI, 4 corner points, side, orientation, engine, thresholds")
         )
         layout.addLayout(row)
         layout.addWidget(self.list, 1)
@@ -76,9 +76,9 @@ class ProfilesPage(QWidget):
             self.state.config.set("active_profile", name)
             self.state.config.save()
             self.refresh()
-            self.state.status_message.emit(f"โหลด Profile: {name}")
+            self.state.status_message.emit(f"Loaded Profile: {name}")
         except Exception as exc:  # noqa: BLE001
-            QMessageBox.warning(self, "โหลดไม่สำเร็จ", str(exc))
+            QMessageBox.warning(self, "Load failed", str(exc))
 
     def save_current(self) -> None:
         self.state.save_profile()
@@ -87,7 +87,7 @@ class ProfilesPage(QWidget):
     def create_new(self) -> None:
         name = self.name_edit.text().strip()
         if not name:
-            QMessageBox.information(self, "ชื่อว่าง", "ใส่ชื่อ Profile ก่อน")
+            QMessageBox.information(self, "Name empty", "Enter a Profile name first")
             return
         self.state.sync_profile_from_state()
         new_p = Profile.from_dict(self.state.profile.to_dict())
@@ -95,4 +95,4 @@ class ProfilesPage(QWidget):
         self.state.profile = new_p
         self.state.save_profile()
         self.refresh()
-        self.state.status_message.emit(f"สร้าง Profile: {name}")
+        self.state.status_message.emit(f"Created Profile: {name}")

@@ -69,7 +69,7 @@ class CornerEditor(QWidget):
         painter.fillRect(self.rect(), QColor(13, 15, 20))
         if self._image is None:
             painter.setPen(QColor(154, 160, 166))
-            painter.drawText(self.rect(), Qt.AlignmentFlag.AlignCenter, "จับภาพ ROI ก่อน แล้วปรับ 4 มุม")
+            painter.drawText(self.rect(), Qt.AlignmentFlag.AlignCenter, "Capture ROI first, then adjust the 4 corners")
             painter.end()
             return
 
@@ -89,7 +89,7 @@ class CornerEditor(QWidget):
             pts = [self._img_to_widget(x, y) for x, y in self._corners]
             for i in range(4):
                 painter.drawLine(pts[i], pts[(i + 1) % 4])
-            labels = ["ซ้ายบน", "ขวาบน", "ขวาล่าง", "ซ้ายล่าง"]
+            labels = ["Top-left", "Top-right", "Bottom-right", "Bottom-left"]
             colors = [
                 QColor(241, 196, 15),
                 QColor(46, 204, 113),

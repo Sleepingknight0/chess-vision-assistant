@@ -32,8 +32,8 @@ class TrainingPage(QWidget):
         title = QLabel("Template Training")
         title.setObjectName("titleLabel")
         hint = QLabel(
-            "คลิกช่องบนกระดาน 2D แล้วระบุชนิดหมากเพื่อเก็บตัวอย่างภาพ "
-            "(ใช้ตอน Recovery / ตำแหน่งไม่มาตรฐาน — ไม่รับประกันความแม่นยำบนโมเดล 3D)"
+            "Click a square on the 2D board and choose a piece type to save image samples "
+            "(used for Recovery / non-standard positions — accuracy on 3D models is not guaranteed)"
         )
         hint.setObjectName("mutedLabel")
         hint.setWordWrap(True)
@@ -64,16 +64,16 @@ class TrainingPage(QWidget):
         self.lbl_counts = QLabel()
         self._refresh_counts()
 
-        btn_save = QPushButton("บันทึกตัวอย่างช่องที่เลือก")
+        btn_save = QPushButton("Save sample for selected square")
         btn_save.setObjectName("primaryButton")
         btn_save.clicked.connect(self._save_selected)
         self._selected_sq: Optional[str] = None
 
-        btn_reload = QPushButton("โหลด Template ใหม่")
+        btn_reload = QPushButton("Reload Templates")
         btn_reload.clicked.connect(self._reload)
 
         row = QHBoxLayout()
-        row.addWidget(QLabel("ชนิดหมาก:"))
+        row.addWidget(QLabel("Piece type:"))
         row.addWidget(self.piece_combo, 1)
         row.addWidget(btn_save)
         row.addWidget(btn_reload)
@@ -94,7 +94,7 @@ class TrainingPage(QWidget):
 
     def _refresh_counts(self) -> None:
         parts = [f"{k}:{self.library.count(k)}" for k in PIECE_KEYS]
-        self.lbl_counts.setText("ตัวอย่าง: " + " ".join(parts))
+        self.lbl_counts.setText("Samples: " + " ".join(parts))
 
     def _on_capture(self) -> None:
         if self.state.last_warped_bgr is not None:
@@ -107,14 +107,14 @@ class TrainingPage(QWidget):
 
     def _on_square(self, sq: str) -> None:
         self._selected_sq = sq
-        self.state.status_message.emit(f"เลือกช่อง {sq} สำหรับเก็บ template")
+        self.state.status_message.emit(f"Selected square {sq} for template")
 
     def _save_selected(self) -> None:
         if not self._selected_sq:
-            QMessageBox.information(self, "ยังไม่เลือกช่อง", "คลิกช่องบนกระดาน 2D ก่อน")
+            QMessageBox.information(self, "No square selected", "Click a square on the 2D board first")
             return
         if self.state.last_warped_bgr is None:
-            QMessageBox.warning(self, "ไม่มีภาพ", "จับภาพกระดานก่อน")
+            QMessageBox.warning(self, "No image", "Capture the board first")
             return
         grid = BoardGrid(
             size=self.state.last_warped_bgr.shape[0],
@@ -124,7 +124,7 @@ class TrainingPage(QWidget):
         symbol = self.piece_combo.currentData()
         self.library.add_sample(symbol, crop)
         self._refresh_counts()
-        self.state.status_message.emit(f"บันทึก template {symbol} จากช่อง {self._selected_sq}")
+        self.state.status_message.emit(f"Saved template {symbol} from square {self._selected_sq}")
 
     def _reload(self) -> None:
         self.library.load()

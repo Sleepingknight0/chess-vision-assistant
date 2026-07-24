@@ -82,7 +82,7 @@ class AutoMoveTracker:
 
         if not self.locked:
             self.lock(warped_bgr)
-            return AutoResult(None, 0.0, [], True, "ล็อกภาพก่อนเดินแล้ว", self._last_heat, [])
+            return AutoResult(None, 0.0, [], True, "pre-move frame locked", self._last_heat, [])
 
         prev_heat = self._last_heat
         res = self._analyze(warped_bgr, board)
@@ -100,7 +100,7 @@ class AutoMoveTracker:
             and float(np.max(np.abs(res.heat - prev_heat))) < 2.5
         )
         if not heat_stable:
-            res.message = f"รอหมากหยุดนิ่ง | {res.message}"
+            res.message = f"waiting for piece to settle | {res.message}"
             return res
 
         # consecutive confirmation for auto mode
@@ -114,18 +114,18 @@ class AutoMoveTracker:
         if res.score >= self.accept_score and self._hits >= self.confirm_hits:
             self._hits = 0
             self._hits_uci = ""
-            res.message = f"พร้อมยืนยัน {res.message}"
+            res.message = f"ready to confirm {res.message}"
             return res
 
         if res.score >= self.accept_score * 1.5 and self._hits >= 1:
             self._hits = 0
             self._hits_uci = ""
-            res.message = f"พร้อมยืนยัน {res.message}"
+            res.message = f"ready to confirm {res.message}"
             return res
 
         res.move = res.move  # keep candidate
-        res.message = f"รอ conf {uci} ({self._hits}/{self.confirm_hits}) | {res.message}"
-        # Downgrade so service treats as watching unless message has พร้อมยืนยัน
+        res.message = f"waiting conf {uci} ({self._hits}/{self.confirm_hits}) | {res.message}"
+        # Downgrade so service treats as watching unless message has ready to confirm
         return res
 
     def force_best(self, warped_bgr: np.ndarray, board: chess.Board) -> AutoResult:
@@ -134,7 +134,7 @@ class AutoMoveTracker:
             self.lock(warped_bgr)
             return AutoResult(
                 None, 0.0, [], True,
-                "บันทึกภาพก่อนเดินแล้ว → เดินในเกม → กดจับการเดินอีกครั้ง",
+                "pre-move frame saved → move in game → press capture move again",
                 None, [],
             )
         return self._analyze(warped_bgr, board)
@@ -157,7 +157,7 @@ class AutoMoveTracker:
         if max_d < 4.0:
             return AutoResult(
                 None, 0.0, [], True,
-                f"ภาพเหมือนเดิม maxΔ={max_d:.0f} — ยังไม่เห็นการเดิน",
+                f"image unchanged maxΔ={max_d:.0f} — no move detected yet",
                 heat, pairs[:6],
             )
 
@@ -184,7 +184,7 @@ class AutoMoveTracker:
         if not cands:
             return AutoResult(
                 None, 0.0, [], True,
-                f"{pattern} | ไม่มี legal move ที่อธิบายได้",
+                f"{pattern} | no legal move explains the change",
                 heat, pairs[:8],
             )
 

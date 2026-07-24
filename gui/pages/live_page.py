@@ -58,7 +58,7 @@ class LivePage(QWidget):
         self.lbl_best = QLabel("Best Move: —")
         self.lbl_eval = QLabel("Evaluation: —")
         self.lbl_conf = QLabel("Confidence: —")
-        self.lbl_detect = QLabel("Detection: หยุดอยู่")
+        self.lbl_detect = QLabel("Detection: stopped")
         self.lbl_fen = QLabel()
         self.lbl_fen.setObjectName("mutedLabel")
         self.lbl_fen.setWordWrap(True)
@@ -67,40 +67,40 @@ class LivePage(QWidget):
         self.lbl_explain.setObjectName("mutedLabel")
 
         # Primary workflow: Before / After + chess logic
-        scan_box = QGroupBox("จับการเดินจากภาพ + กฎหมากรุก (แนะนำ)")
+        scan_box = QGroupBox("Detect moves from image + chess rules (recommended)")
         sb = QVBoxLayout(scan_box)
         sb.addWidget(QLabel(
-            "1) กด «จำภาพก่อนเดิน» ตอนกระดานนิ่ง\n"
-            "2) เดินในเกม (เราหรือคู่แข่ง) รอให้นิ่ง\n"
-            "3) กด «จับการเดินหลังเดิน» — ระบบดูว่าตัวไหนหาย/มา แล้วคัดเฉพาะ legal move"
+            "1) Press «Remember image before move» while the board is still\n"
+            "2) Move in the game (you or opponent) and wait until still\n"
+            "3) Press «Capture move after move» — the system sees which pieces left/arrived and keeps only legal moves"
         ))
         row_scan = QHBoxLayout()
-        self.btn_before = QPushButton("1. จำภาพก่อนเดิน")
+        self.btn_before = QPushButton("1. Remember image before move")
         self.btn_before.setObjectName("primaryButton")
         self.btn_before.clicked.connect(self.lock_reference)
-        self.btn_after = QPushButton("2. จับการเดินหลังเดิน")
+        self.btn_after = QPushButton("2. Capture move after move")
         self.btn_after.setObjectName("primaryButton")
         self.btn_after.clicked.connect(self.confirm_pending)
         row_scan.addWidget(self.btn_before)
         row_scan.addWidget(self.btn_after)
         sb.addLayout(row_scan)
 
-        manual_box = QGroupBox("อัปเดตมือ (ชัวร์ 100%)")
+        manual_box = QGroupBox("Manual update (100% reliable)")
         mb = QVBoxLayout(manual_box)
-        mb.addWidget(QLabel("คลิกช่องต้นทาง→ปลายทางบนกระดานขวา หรือพิมพ์ e2e4"))
-        self.lbl_click = QLabel("คลิกช่อง: (ยังไม่เลือกต้นทาง)")
+        mb.addWidget(QLabel("Click from→to squares on the right board, or type e2e4"))
+        self.lbl_click = QLabel("Square click: (no origin selected yet)")
         mb.addWidget(self.lbl_click)
         uci_row = QHBoxLayout()
         self.uci_edit = QLineEdit()
         self.uci_edit.setPlaceholderText("e2e4 / Nf3 / O-O")
         self.uci_edit.returnPressed.connect(self.apply_uci_text)
-        btn_uci = QPushButton("ใส่การเดิน")
+        btn_uci = QPushButton("Enter move")
         btn_uci.clicked.connect(self.apply_uci_text)
         uci_row.addWidget(self.uci_edit, 1)
         uci_row.addWidget(btn_uci)
         mb.addLayout(uci_row)
 
-        info = QGroupBox("สถานะ")
+        info = QGroupBox("Status")
         info_l = QVBoxLayout(info)
         for w in (
             self.lbl_side,
@@ -124,15 +124,15 @@ class LivePage(QWidget):
         btn_analyze = QPushButton("Analyze")
         btn_analyze.setObjectName("primaryButton")
         btn_analyze.clicked.connect(self.analyze)
-        self.btn_auto = QPushButton("Auto ต่อเนื่อง: ปิด")
-        self.btn_auto.setToolTip("เปิดเฉพาะถ้า Before/After ใช้ได้แล้ว — ค่าเริ่มต้นปิดเพราะมักจับผิด")
+        self.btn_auto = QPushButton("Continuous Auto: Off")
+        self.btn_auto.setToolTip("Enable only after Before/After works — off by default because it often misdetects")
         self.btn_auto.clicked.connect(self.toggle_auto_mode)
-        self.btn_confirm = QPushButton("จับการเดินหลังเดิน")
+        self.btn_confirm = QPushButton("Capture move after move")
         self.btn_confirm.setObjectName("primaryButton")
         self.btn_confirm.clicked.connect(self.confirm_pending)
-        self.btn_manual = QPushButton("เลือกจากรายการ legal")
+        self.btn_manual = QPushButton("Pick from legal list")
         self.btn_manual.clicked.connect(self.manual_pick_move)
-        self.btn_lock = QPushButton("จำภาพก่อนเดิน")
+        self.btn_lock = QPushButton("Remember image before move")
         self.btn_lock.clicked.connect(self.lock_reference)
         btn_undo = QPushButton("Undo Last Detection")
         btn_undo.clicked.connect(self.undo)
@@ -167,10 +167,10 @@ class LivePage(QWidget):
             buttons.addWidget(b, i // 3, i % 3)
 
         left = QVBoxLayout()
-        left.addWidget(QLabel("ภาพกระดาน (warped + grid)"))
+        left.addWidget(QLabel("Board image (warped + grid)"))
         left.addWidget(self.preview, 1)
         right = QVBoxLayout()
-        right.addWidget(QLabel("กระดานที่ระบบเข้าใจ — คลิก from→to เพื่ออัปเดตมือ"))
+        right.addWidget(QLabel("Board as the system understands it — click from→to to update manually"))
         right.addWidget(self.board_view, 1)
         right.addWidget(scan_box)
         right.addWidget(manual_box)
@@ -195,13 +195,13 @@ class LivePage(QWidget):
     def refresh_labels(self) -> None:
         t = self.state.team
         self.lbl_side.setText(
-            f"ฝ่ายผู้ใช้: {t.user_label()} "
+            f"User side: {t.user_label()} "
             f"({'White' if t.user_is_white else 'Black'})"
         )
         is_user = self.state.board_state.is_user_turn(t.user_is_white)
         turn_side = "White" if self.state.board_state.side_to_move_is_white() else "Black"
         self.lbl_turn.setText(
-            f"ตาเดิน: {turn_side} — {'ตาของฉัน' if is_user else 'ตาของคู่แข่ง'}"
+            f"To move: {turn_side} — {'my turn' if is_user else 'opponent turn'}"
         )
         self.lbl_fen.setText(f"FEN: {self.state.board_state.fen()}")
         self.board_view.set_orientation(self.state.orientation)
@@ -244,7 +244,7 @@ class LivePage(QWidget):
     def capture_once(self) -> None:
         if self.state.region is None:
             QMessageBox.warning(
-                self, "ยังไม่ครบ", "กรุณาเลือกพื้นที่กระดานในหน้า Board Calibration ก่อน"
+                self, "Not ready", "Please select the board region on the Board Calibration page first"
             )
             return
         try:
@@ -257,11 +257,11 @@ class LivePage(QWidget):
             # Lock visual reference to current board (so next scan can see deltas)
             self.state.detection.set_reference_frame(warped, self.state.board_state.board)
             self.state.capture_changed.emit()
-            self.state.status_message.emit("จับภาพสำเร็จ + ล็อกภาพอ้างอิงแล้ว")
-            self.state.detection_message.emit("พร้อม — เดินหมากในเกม แล้วกด Confirm / สแกนการเดิน")
+            self.state.status_message.emit("Capture successful + reference image locked")
+            self.state.detection_message.emit("Ready — move in the game, then press Confirm / scan move")
         except Exception as exc:  # noqa: BLE001
-            QMessageBox.critical(self, "จับภาพไม่สำเร็จ", str(exc))
-            self.state.status_message.emit(f"จับภาพผิดพลาด: {exc}")
+            QMessageBox.critical(self, "Capture failed", str(exc))
+            self.state.status_message.emit(f"Capture error: {exc}")
 
     def toggle_capture(self) -> None:
         if self._worker and self._worker.isRunning():
@@ -271,7 +271,7 @@ class LivePage(QWidget):
 
     def start_capture(self) -> None:
         if self.state.region is None:
-            QMessageBox.warning(self, "ยังไม่ครบ", "ตั้งค่า ROI ใน Board Calibration ก่อน")
+            QMessageBox.warning(self, "Not ready", "Set the ROI in Board Calibration first")
             return
         self.state.refresh_detection_config()
         self.state.detection.reset(self.state.board_state.board)
@@ -286,7 +286,7 @@ class LivePage(QWidget):
             self.state.detection.set_reference_frame(warped, self.state.board_state.board)
             self.state.capture_changed.emit()
         except Exception as exc:  # noqa: BLE001
-            self.state.status_message.emit(f"ล็อกภาพเริ่มต้นไม่สำเร็จ: {exc}")
+            self.state.status_message.emit(f"Initial image lock failed: {exc}")
         self._worker = CaptureWorker(self)
         self._worker.configure(
             self.state.monitor_id,
@@ -301,9 +301,9 @@ class LivePage(QWidget):
         self.state.capture_active = True
         self.btn_start.setText("Stop Capture")
         self.state.status_message.emit(
-            "เริ่มจับภาพอัตโนมัติ — เดินในเกม (เราหรือคู่แข่ง) ระบบจะจับและอัปเดตเอง"
+            "Auto capture started — move in the game (you or opponent); the system will detect and update"
         )
-        self.state.detection_message.emit("Auto ON — รอการเคลื่อนไหวบนกระดาน")
+        self.state.detection_message.emit("Auto ON — waiting for board motion")
 
     def stop_capture(self) -> None:
         if self._worker:
@@ -312,11 +312,11 @@ class LivePage(QWidget):
             self._worker = None
         self.state.capture_active = False
         self.btn_start.setText("Start Capture")
-        self.state.detection_message.emit("Detection: หยุดอยู่")
+        self.state.detection_message.emit("Detection: stopped")
 
     def toggle_pause(self) -> None:
         if not self._worker:
-            self.state.status_message.emit("ยังไม่ได้ Start Capture")
+            self.state.status_message.emit("Start Capture has not been pressed yet")
             return
         self.state.capture_paused = not self.state.capture_paused
         self._worker.set_paused(self.state.capture_paused)
@@ -325,12 +325,12 @@ class LivePage(QWidget):
     def toggle_auto_mode(self) -> None:
         self._auto_mode = not self._auto_mode
         self.btn_auto.setText(
-            "Auto ต่อเนื่อง: เปิด" if self._auto_mode else "Auto ต่อเนื่อง: ปิด"
+            "Continuous Auto: On" if self._auto_mode else "Continuous Auto: Off"
         )
         self.state.detection_message.emit(
-            "Auto ต่อเนื่องเปิด — อาจจับผิดได้ แนะนำ Before/After"
+            "Continuous Auto on — may misdetect; Before/After recommended"
             if self._auto_mode
-            else "ใช้ปุ่ม จำภาพก่อนเดิน → เดินเกม → จับการเดินหลังเดิน"
+            else "Use Remember image before move → play move → Capture move after move"
         )
 
     def _on_frame(self, roi, warped) -> None:
@@ -344,7 +344,7 @@ class LivePage(QWidget):
                     self.state.detection.set_reference_frame(
                         warped, self.state.board_state.board
                     )
-                    self.state.detection_message.emit("พร้อมจับตาถัดไป (ล็อกภาพใหม่แล้ว)")
+                    self.state.detection_message.emit("Ready for next move (re-locked image)")
                 self._frame_skip = (self._frame_skip + 1) % 3
                 if self._frame_skip == 0:
                     self.state.capture_changed.emit()
@@ -384,7 +384,7 @@ class LivePage(QWidget):
                     self._auto_mode
                     and hyp.confidence >= 0.55
                     and top.uci() != self._last_auto_uci
-                    and "กำลังจับ" in (event.message or "")
+                    and "capturing" in (event.message or "")
                 ):
                     # wait for ready; don't apply mid-watch
                     pass
@@ -414,7 +414,7 @@ class LivePage(QWidget):
 
         if event.kind == "move":
             self.state.detection_message.emit(
-                f"ตรวจพบ: {san} ({top.uci()}) — กดสแกนมือเพื่อยืนยัน"
+                f"Detected: {san} ({top.uci()}) — press manual scan to confirm"
             )
 
     def lock_reference(self) -> None:
@@ -424,11 +424,11 @@ class LivePage(QWidget):
             # try start capture grab
             if self.state.region is None:
                 QMessageBox.warning(
-                    self, "ยังไม่มีภาพ",
-                    "ตั้ง Board Calibration แล้วกด Start Capture หรือ Capture Once ก่อน",
+                    self, "No image yet",
+                    "Set Board Calibration, then press Start Capture or Capture Once first",
                 )
                 return
-            QMessageBox.warning(self, "ไม่มีภาพ", "กด Capture Once หรือ Start Capture ก่อน")
+            QMessageBox.warning(self, "No image", "Press Capture Once or Start Capture first")
             return
         self.state.detection.set_reference_frame(warped, self.state.board_state.board)
         self.state.detection.clear_pending()
@@ -437,18 +437,18 @@ class LivePage(QWidget):
         self._auto_lock_frames = 0
         self.preview.set_heat(None)
         self.state.detection_message.emit(
-            "จำภาพก่อนเดินแล้ว → เดินในเกม → กด «จับการเดินหลังเดิน»"
+            "Image before move remembered → move in the game → press «Capture move after move»"
         )
-        self.state.status_message.emit("OK: จำภาพก่อนเดินแล้ว")
+        self.state.status_message.emit("OK: image before move remembered")
         QMessageBox.information(
             self,
-            "จำภาพแล้ว",
-            "บันทึกภาพกระดานตอนนี้แล้ว\n\n"
-            "ต่อไป:\n"
-            "1. เดินหมากในเกม (ฝั่งคุณหรือคู่แข่ง)\n"
-            "2. รอให้นิ่ง\n"
-            "3. กด «2. จับการเดินหลังเดิน»\n\n"
-            "ระบบจะดูว่าตัวไหนหาย/มา แล้วเลือกเฉพาะการเดินที่ถูกกฎหมากรุก",
+            "Image remembered",
+            "Current board image has been saved.\n\n"
+            "Next:\n"
+            "1. Make a move in the game (your side or opponent)\n"
+            "2. Wait until the board is still\n"
+            "3. Press «2. Capture move after move»\n\n"
+            "The system will see which pieces left/arrived and pick only chess-legal moves",
         )
 
     def _grab_warped(self):
@@ -466,7 +466,7 @@ class LivePage(QWidget):
             self.state.capture_changed.emit()
             return warped
         except Exception as exc:  # noqa: BLE001
-            self.state.status_message.emit(f"จับภาพไม่สำเร็จ: {exc}")
+            self.state.status_message.emit(f"Capture failed: {exc}")
             return self.state.last_warped_bgr
 
     def _prompt_move_choice(self, hyp: MoveHypothesis) -> None:
@@ -485,18 +485,18 @@ class LivePage(QWidget):
                 except Exception:
                     items.append(m.uci())
             if not items:
-                self.state.status_message.emit("ไม่มีรายการเดินให้เลือก")
+                self.state.status_message.emit("No moves to choose from")
                 return
             choice, ok = QInputDialog.getItem(
                 self,
-                "ยืนยันการเดิน",
-                hyp.message or "เลือกการเดินที่เกิดขึ้นในเกม",
+                "Confirm move",
+                hyp.message or "Select the move that happened in the game",
                 items,
                 0,
                 False,
             )
             if not ok:
-                self.state.detection_message.emit("ยังไม่ยืนยัน — กด Confirm อีกครั้งหรือเลือกมือ")
+                self.state.detection_message.emit("Not confirmed — press Confirm again or pick manually")
                 return
             idx = items.index(choice)
             self._apply_move(hyp.moves[idx], hyp.confidence)
@@ -517,7 +517,7 @@ class LivePage(QWidget):
             }.get(m.promotion, "?")
             labels.append(f"{m.uci()[:4]} → {name}")
         choice, ok = QInputDialog.getItem(
-            self, "Pawn Promotion", "เลื่อนเป็นหมากชนิดใด?", labels, 0, False
+            self, "Pawn Promotion", "Promote to which piece?", labels, 0, False
         )
         if not ok:
             return
@@ -527,15 +527,15 @@ class LivePage(QWidget):
         """Step 2: compare after-move image → chess-legal candidates only."""
         warped = self._grab_warped()
         if warped is None:
-            QMessageBox.warning(self, "ไม่มีภาพ", "กด Start Capture หรือ Capture Once ก่อน")
+            QMessageBox.warning(self, "No image", "Press Start Capture or Capture Once first")
             return
         if not self.state.detection.auto.locked:
             self.state.detection.set_reference_frame(warped, self.state.board_state.board)
             QMessageBox.information(
                 self,
-                "ยังไม่มีภาพก่อนเดิน",
-                "เพิ่งจำภาพตอนนี้ให้แล้ว\n\n"
-                "เดินในเกมก่อน แล้วค่อยกด «จับการเดินหลังเดิน» อีกครั้ง",
+                "No before-move image yet",
+                "Just locked the current image for you.\n\n"
+                "Make a move in the game first, then press «Capture move after move» again",
             )
             return
 
@@ -544,7 +544,7 @@ class LivePage(QWidget):
             event = self.state.detection.scan_now(warped, self.state.board_state.board)
             heat = getattr(event, "heat", None)
         except Exception as exc:  # noqa: BLE001
-            QMessageBox.warning(self, "สแกนล้มเหลว", str(exc))
+            QMessageBox.warning(self, "Scan failed", str(exc))
             return
 
         if heat is not None:
@@ -565,8 +565,8 @@ class LivePage(QWidget):
                 san = top.uci()
             piece = board.piece_at(top.from_square)
             pname = {
-                "P": "เบี้ย", "N": "ม้า", "B": "บิชอป", "R": "เรือ", "Q": "ควีน", "K": "คิง",
-                "p": "เบี้ย", "n": "ม้า", "b": "บิชอป", "r": "เรือ", "q": "ควีน", "k": "คิง",
+                "P": "Pawn", "N": "Knight", "B": "Bishop", "R": "Rook", "Q": "Queen", "K": "King",
+                "p": "Pawn", "n": "Knight", "b": "Bishop", "r": "Rook", "q": "Queen", "k": "King",
             }.get(piece.symbol() if piece else "", "?")
             fr = chess.square_name(top.from_square)
             to = chess.square_name(top.to_square)
@@ -578,17 +578,17 @@ class LivePage(QWidget):
                         bits.append(board.san(m))
                     except Exception:
                         bits.append(m.uci())
-                alts = "\nทาง legal อื่น: " + ", ".join(bits)
+                alts = "\nOther legal: " + ", ".join(bits)
 
             # Single clear legal explanation → apply with one confirm
             ans = QMessageBox.question(
                 self,
-                "การเดินตามกฎหมากรุก",
-                f"หมากที่ออก: {pname} จาก {fr}\n"
-                f"ไปช่อง: {to}\n"
+                "Chess-legal move",
+                f"Piece leaving: {pname} from {fr}\n"
+                f"To square: {to}\n"
                 f"SAN: {san}   UCI: {top.uci()}\n\n"
                 f"{dbg}{alts}\n\n"
-                f"อัปเดตกระดานตามนี้?",
+                f"Update the board with this?",
             )
             if ans == QMessageBox.StandardButton.Yes:
                 self._apply_move(top, max(hyp.confidence, 0.6), auto=False)
@@ -598,11 +598,11 @@ class LivePage(QWidget):
 
         ans = QMessageBox.question(
             self,
-            "จับ legal move ไม่ได้",
+            "Could not detect a legal move",
             f"{dbg}\n\n"
-            "สาเหตุบ่อย: grid ไม่ตรงช่อง / ยังไม่วิ่ง / จำภาพหลังเดินแล้ว\n\n"
-            "เลือกการเดินจากรายการ legal เองไหม?\n"
-            "(หรือคลิก from→to บนกระดานขวา)",
+            "Common causes: grid not aligned / board still moving / image locked after the move\n\n"
+            "Pick a move from the legal list yourself?\n"
+            "(or click from→to on the right board)",
         )
         if ans == QMessageBox.StandardButton.Yes:
             self.manual_pick_move()
@@ -612,7 +612,7 @@ class LivePage(QWidget):
         board = self.state.board_state.board
         moves = list(board.legal_moves)
         if not moves:
-            QMessageBox.information(self, "จบเกม", "ไม่มี legal move")
+            QMessageBox.information(self, "Game over", "No legal moves")
             return
         items = []
         move_list = []
@@ -625,8 +625,8 @@ class LivePage(QWidget):
             move_list.append(m)
         choice, ok = QInputDialog.getItem(
             self,
-            "เลือกการเดินมือ",
-            "เลือกตาที่เพิ่งเดินในเกม:",
+            "Pick move manually",
+            "Select the move just played in the game:",
             items,
             0,
             False,
@@ -642,19 +642,19 @@ class LivePage(QWidget):
             piece = board.piece_at(chess.parse_square(sq))
             if piece is None or piece.color != board.turn:
                 self.lbl_click.setText(
-                    f"ช่อง {sq} ไม่มีหมากฝั่งที่เดิน — คลิกช่องที่มีหมากฝั่ง {('White' if board.turn else 'Black')}"
+                    f"Square {sq} has no piece for the side to move — click a square with a {'White' if board.turn else 'Black'} piece"
                 )
                 return
             self._click_from = sq
-            self.lbl_click.setText(f"ต้นทาง: {sq} → คลิกช่องปลายทาง")
-            self.state.status_message.emit(f"เลือกต้นทาง {sq}")
+            self.lbl_click.setText(f"From: {sq} → click destination square")
+            self.state.status_message.emit(f"Origin selected {sq}")
             return
 
         fr = self._click_from
         to = sq
         self._click_from = None
         if fr == to:
-            self.lbl_click.setText("ยกเลิก — คลิกต้นทางใหม่")
+            self.lbl_click.setText("Cancelled — click a new origin")
             return
 
         # Build UCI (promotion default queen)
@@ -673,12 +673,12 @@ class LivePage(QWidget):
                     found = m2
                     break
             if found is None:
-                self.lbl_click.setText(f"ผิดกฎ: {fr}→{to} — คลิกต้นทางใหม่")
-                self.state.status_message.emit(f"การเดิน {fr}{to} ผิดกฎ")
+                self.lbl_click.setText(f"Illegal: {fr}→{to} — click a new origin")
+                self.state.status_message.emit(f"Move {fr}{to} is illegal")
                 return
             move = found
 
-        self.lbl_click.setText(f"อัปเดตแล้ว: {move.uci()} — คลิกต้นทางตาถัดไป")
+        self.lbl_click.setText(f"Updated: {move.uci()} — click origin for next move")
         self._apply_move(move, 1.0, auto=False)
 
     def apply_uci_text(self) -> None:
@@ -701,8 +701,8 @@ class LivePage(QWidget):
         if move is None or move not in board.legal_moves:
             QMessageBox.warning(
                 self,
-                "เดินไม่ได้",
-                f"ไม่เข้าใจหรือผิดกฎ: {text}\nตัวอย่าง: e2e4, e7e5, Nf3, O-O",
+                "Illegal move",
+                f"Not understood or illegal: {text}\nExamples: e2e4, e7e5, Nf3, O-O",
             )
             return
         self.uci_edit.clear()
@@ -715,9 +715,9 @@ class LivePage(QWidget):
             self.state.board_state.push_move(move)
         except ValueError as exc:
             if not auto:
-                QMessageBox.warning(self, "การเดินผิดกฎ", str(exc))
+                QMessageBox.warning(self, "Illegal move", str(exc))
             else:
-                self.state.detection_message.emit(f"ข้ามการเดินผิดกฎ: {move.uci()}")
+                self.state.detection_message.emit(f"Skipped illegal move: {move.uci()}")
             return
 
         self._last_auto_uci = move.uci()
@@ -735,20 +735,15 @@ class LivePage(QWidget):
             )
         self.state.board_changed.emit()
 
-        side = (
-            "ฉัน"
-            if not self.state.board_state.is_user_turn(self.state.team.user_is_white)
-            else "คู่แข่ง"
-        )
         # After push, turn flipped — the side that just moved is opposite of current turn
         just_moved_user = not self.state.board_state.is_user_turn(self.state.team.user_is_white)
-        who = "ฉัน" if just_moved_user else "คู่แข่ง"
+        who = "Me" if just_moved_user else "Opponent"
         tag = "Auto" if auto else "Manual"
         self.state.status_message.emit(
-            f"{tag}: {who} เดิน {move.uci()} ({confidence:.0%})"
+            f"{tag}: {who} played {move.uci()} ({confidence:.0%})"
         )
         self.state.detection_message.emit(
-            f"อัปเดต {move.uci()} แล้ว — รอภาพนิ่งแล้วล็อกใหม่จับตาถัดไป"
+            f"Updated {move.uci()} — wait for a still image then re-lock for next move"
         )
 
         # Analyze when it becomes user's turn
@@ -758,17 +753,17 @@ class LivePage(QWidget):
         ):
             self.analyze()
         elif not self.state.board_state.is_user_turn(self.state.team.user_is_white):
-            self.lbl_explain.setText("ตาคู่แข่ง — รอเขาเดิน ระบบจะจับอัตโนมัติ")
+            self.lbl_explain.setText("Opponent's turn — wait for their move; system will detect automatically")
             self.board_view.clear_arrows()
             self.state.overlay.clear()
 
     def analyze(self) -> None:
         """Always async — never freeze the window on Stockfish."""
         if self._analyze_worker is not None and self._analyze_worker.isRunning():
-            self.state.status_message.emit("กำลังวิเคราะห์อยู่… รอสักครู่")
+            self.state.status_message.emit("Analysis already running… please wait")
             return
-        self.state.status_message.emit("กำลังวิเคราะห์ (พื้นหลัง)…")
-        self.lbl_explain.setText("กำลังวิเคราะห์ด้วย Stockfish…")
+        self.state.status_message.emit("Analyzing (background)…")
+        self.lbl_explain.setText("Analyzing with Stockfish…")
         # Live analysis: short time so UI stays responsive
         self._analyze_worker = AnalyzeWorker(
             self.state, movetime_ms=600, multipv=3, parent=self
@@ -789,7 +784,7 @@ class LivePage(QWidget):
             )
 
     def _on_analyze_fail(self, msg: str) -> None:
-        self.state.status_message.emit(f"วิเคราะห์ล้มเหลว: {msg}")
+        self.state.status_message.emit(f"Analysis failed: {msg}")
         self.lbl_explain.setText(msg)
 
     def undo(self) -> None:
@@ -799,9 +794,9 @@ class LivePage(QWidget):
             if warped is not None:
                 self.state.detection.set_reference_frame(warped, self.state.board_state.board)
             self.state.board_changed.emit()
-            self.state.status_message.emit("ย้อนการเดินล่าสุดแล้ว + ล็อกภาพใหม่")
+            self.state.status_message.emit("Last move undone + image re-locked")
         else:
-            self.state.status_message.emit("ไม่มีอะไรให้ย้อน")
+            self.state.status_message.emit("Nothing to undo")
 
     def reset_game(self) -> None:
         self.state.board_state.reset_standard()
@@ -816,12 +811,12 @@ class LivePage(QWidget):
         self.state.overlay.clear()
         self.state.board_changed.emit()
         self.state.analysis_changed.emit()
-        self.state.status_message.emit("รีเซ็ตเกม + ล็อกภาพอ้างอิงแล้ว")
+        self.state.status_message.emit("Game reset + reference image locked")
 
     def toggle_overlay(self) -> None:
         self.state.update_overlay_geometry()
         on = self.state.overlay.toggle()
-        self.state.status_message.emit("Overlay เปิด" if on else "Overlay ปิด")
+        self.state.status_message.emit("Overlay on" if on else "Overlay off")
         if on:
             self.state.push_analysis_to_overlay()
 

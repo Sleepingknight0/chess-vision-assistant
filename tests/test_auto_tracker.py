@@ -114,7 +114,7 @@ def test_mid_animation_not_confirmed_then_settled_confirms():
     mc, mr = ori.square_to_display("e3")
     _blob(mid, mc, mr, (230, 230, 230))
     r1 = t.observe(mid, board)
-    assert "พร้อมยืนยัน" not in r1.message, r1.message
+    assert "ready to confirm" not in r1.message, r1.message
 
     # Settled: e2 empty, piece landed on e4
     settled = before.copy()
@@ -123,14 +123,14 @@ def test_mid_animation_not_confirmed_then_settled_confirms():
     _blob(settled, fc, fr, (230, 230, 230))
 
     r2 = t.observe(settled, board)  # heat still differs from the mid frame
-    assert "พร้อมยืนยัน" not in r2.message, r2.message
+    assert "ready to confirm" not in r2.message, r2.message
 
     ready = r2
     for _ in range(3):  # stable frames: must confirm within a few observes
         ready = t.observe(settled, board)
-        if "พร้อมยืนยัน" in ready.message:
+        if "ready to confirm" in ready.message:
             break
-    assert "พร้อมยืนยัน" in ready.message, ready.message
+    assert "ready to confirm" in ready.message, ready.message
     assert ready.move is not None and ready.move.uci() == "e2e4", (
         ready.move and ready.move.uci(),
         ready.message,

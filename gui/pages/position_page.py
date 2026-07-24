@@ -21,8 +21,8 @@ class PositionPage(QWidget):
         title = QLabel("Position Editor")
         title.setObjectName("titleLabel")
         hint = QLabel(
-            "ตั้งตำแหน่งเริ่มต้น 3 วิธี: มาตรฐาน / วางหมากเอง / วาง FEN — "
-            "ใช้เมื่อระบบตรวจจับผิดหรือเริ่มจากตำแหน่งไม่มาตรฐาน"
+            "Set the starting position in 3 ways: standard / place pieces / paste FEN — "
+            "use when detection is wrong or you start from a non-standard position"
         )
         hint.setObjectName("mutedLabel")
         hint.setWordWrap(True)
@@ -56,7 +56,7 @@ class PositionPage(QWidget):
         self.editor.set_fen(fen)
         self.state.detection.reset(self.state.board_state.board)
         self.state.board_changed.emit()
-        self.state.status_message.emit("ใช้ FEN แล้ว")
+        self.state.status_message.emit("FEN applied")
 
     def _sync_from_state(self) -> None:
         fen = self.state.board_state.fen()

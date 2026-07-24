@@ -17,7 +17,7 @@ class MonitorInfo:
     name: str
 
     def label(self) -> str:
-        return f"จอ {self.index}: {self.width}×{self.height} @ ({self.left},{self.top})"
+        return f"Display {self.index}: {self.width}×{self.height} @ ({self.left},{self.top})"
 
 
 def list_monitors() -> list[MonitorInfo]:
@@ -26,7 +26,7 @@ def list_monitors() -> list[MonitorInfo]:
         # monitors[0] is virtual all; 1..n are physical
         for i, mon in enumerate(sct.monitors):
             if i == 0:
-                name = "ทั้งระบบ (virtual)"
+                name = "All displays (virtual)"
             else:
                 name = f"Monitor {i}"
             result.append(

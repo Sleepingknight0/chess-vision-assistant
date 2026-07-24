@@ -127,7 +127,7 @@ class DiffTracker:
                 confidence=0.0,
                 emptied=[],
                 filled=[],
-                message="ล็อกภาพอ้างอิงแล้ว — รอการเดินในเกม",
+                message="reference frame locked — waiting for a move in game",
             )
         scores = self.detector.score_frame(warped_bgr, self.orientation)
         hyp = self._hypothesize(board, self._ref_scores, scores)
@@ -137,7 +137,7 @@ class DiffTracker:
                 confidence=0.0,
                 emptied=[],
                 filled=[],
-                message="ยังไม่เห็นการเปลี่ยนแปลง",
+                message="no change detected yet",
             )
         return hyp
 

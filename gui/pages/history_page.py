@@ -39,22 +39,22 @@ class HistoryPage(QWidget):
         self.fen_box.setMaximumHeight(70)
         self.review_box = QTextEdit()
         self.review_box.setReadOnly(True)
-        self.review_box.setPlaceholderText("ผล Review หลังจบเกมจะแสดงที่นี่…")
+        self.review_box.setPlaceholderText("Review results after the game will appear here…")
 
-        self.chk_shots = QCheckBox("บันทึก Screenshot กระดานแต่ละตา (เก็บในเครื่องเท่านั้น)")
+        self.chk_shots = QCheckBox("Save a board screenshot each move (stored on this machine only)")
         self.chk_shots.setChecked(state.save_move_screenshots)
         self.chk_shots.toggled.connect(self._toggle_shots)
 
-        btn_refresh = QPushButton("รีเฟรช")
+        btn_refresh = QPushButton("Refresh")
         btn_refresh.clicked.connect(self.refresh)
         btn_copy_fen = QPushButton("Copy FEN")
         btn_copy_fen.clicked.connect(self.copy_fen)
-        btn_undo = QPushButton("Undo ล่าสุด")
+        btn_undo = QPushButton("Undo last")
         btn_undo.clicked.connect(self.undo)
         btn_pgn = QPushButton("Export PGN")
         btn_pgn.setObjectName("primaryButton")
         btn_pgn.clicked.connect(self.export_pgn)
-        btn_review = QPushButton("Review เกม (Blunder/Mistake)")
+        btn_review = QPushButton("Review game (Blunder/Mistake)")
         btn_review.clicked.connect(self.run_review)
 
         row = QHBoxLayout()
@@ -67,7 +67,7 @@ class HistoryPage(QWidget):
         layout.addLayout(row)
         layout.addWidget(QLabel("SAN / UCI"))
         layout.addWidget(self.list, 1)
-        layout.addWidget(QLabel("FEN ปัจจุบัน"))
+        layout.addWidget(QLabel("Current FEN"))
         layout.addWidget(self.fen_box)
         layout.addWidget(QLabel("Review"))
         layout.addWidget(self.review_box, 1)
@@ -92,13 +92,13 @@ class HistoryPage(QWidget):
         from PySide6.QtWidgets import QApplication
 
         QApplication.clipboard().setText(self.state.board_state.fen())
-        self.state.status_message.emit("คัดลอก FEN แล้ว")
+        self.state.status_message.emit("FEN copied")
 
     def undo(self) -> None:
         if self.state.board_state.undo_last():
             self.state.detection.reset(self.state.board_state.board)
             self.state.board_changed.emit()
-            self.state.status_message.emit("ย้อนแล้ว")
+            self.state.status_message.emit("Undone")
 
     def export_pgn(self) -> None:
         pgn = pgn_from_uci_list(
@@ -108,7 +108,7 @@ class HistoryPage(QWidget):
         )
         path, _ = QFileDialog.getSaveFileName(
             self,
-            "บันทึก PGN",
+            "Save PGN",
             str(exports_dir() / "game.pgn"),
             "PGN (*.pgn)",
         )
@@ -116,18 +116,18 @@ class HistoryPage(QWidget):
             return
         Path(path).write_text(pgn, encoding="utf-8")
         self.state.status_message.emit(f"Export PGN → {path}")
-        QMessageBox.information(self, "Export แล้ว", f"บันทึกที่\n{path}")
+        QMessageBox.information(self, "Exported", f"Saved to\n{path}")
 
     def run_review(self) -> None:
         ucis = self.state.board_state.history_uci
         if not ucis:
-            QMessageBox.information(self, "ว่าง", "ยังไม่มีการเดิน")
+            QMessageBox.information(self, "Empty", "No moves yet")
             return
         ok, msg = self.state.engine.validate()
         if not ok:
             QMessageBox.warning(self, "Stockfish", msg)
             return
-        self.review_box.setPlainText("กำลัง Review… (local เท่านั้น)")
+        self.review_box.setPlainText("Reviewing… (local only)")
         try:
             reviews = review_game(
                 self.state.engine,
@@ -141,8 +141,8 @@ class HistoryPage(QWidget):
                     f"{r.ply}. {r.san} [{r.uci}]  {r.classification.upper()}  "
                     f"loss={loss}  best={r.best_move_san or '—'}"
                 )
-            self.review_box.setPlainText("\n".join(lines) if lines else "ไม่มีผล")
-            self.state.status_message.emit("Review เสร็จ")
+            self.review_box.setPlainText("\n".join(lines) if lines else "No results")
+            self.state.status_message.emit("Review complete")
         except Exception as exc:  # noqa: BLE001
             self.review_box.setPlainText(str(exc))
-            QMessageBox.warning(self, "Review ล้มเหลว", str(exc))
+            QMessageBox.warning(self, "Review failed", str(exc))

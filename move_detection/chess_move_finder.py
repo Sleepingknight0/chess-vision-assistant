@@ -73,7 +73,7 @@ def find_moves(
             for to in dests:
                 for move in _moves_between(board, fr, to):
                     sc = left_scores.get(fr, 0) * 0.65 + arrive_scores.get(to, 0) * 0.35
-                    add(move, sc, f"หาย={fr} มา={to}")
+                    add(move, sc, f"left={fr} arrived={to}")
 
     # --- Path B: only know origin → any legal destination, rank by arrive score ---
     if origins:
@@ -94,7 +94,7 @@ def find_moves(
                 ):
                     continue
                 sc = fr_sc * 0.7 + to_sc * 0.3
-                add(move, sc, f"ออกจาก={fr} ไป={to} (legal)")
+                add(move, sc, f"from={fr} to={to} (legal)")
 
     # --- Path C: only know destination → legal movers into that square ---
     if dests and not results:
@@ -104,7 +104,7 @@ def find_moves(
                     continue
                 fr = chess.square_name(move.from_square)
                 sc = left_scores.get(fr, 0) * 0.5 + arrive_scores.get(to, 0) * 0.5
-                add(move, sc, f"เข้า={to} จาก={fr}")
+                add(move, sc, f"to={to} from={fr}")
 
     # --- Castling special: king left two squares + rook pattern ---
     for move in board.legal_moves:
@@ -114,7 +114,7 @@ def find_moves(
         to = chess.square_name(move.to_square)
         if left_scores.get(fr, 0) >= leave_min * 0.6:
             sc = left_scores.get(fr, 0) + arrive_scores.get(to, 0)
-            add(move, sc, "โรเคด")
+            add(move, sc, "castling")
 
     results.sort(key=lambda c: -c.score)
     return results
@@ -141,4 +141,4 @@ def explain_pattern(
     left = [f"{s}:{v:.0f}" for s, v in sorted(left_scores.items(), key=lambda x: -x[1])[:3] if v >= 4]
     arr = [f"{s}:{v:.0f}" for s, v in sorted(arrive_scores.items(), key=lambda x: -x[1])[:3] if v >= 4]
     stm = "White" if board.turn == chess.WHITE else "Black"
-    return f"ตา{stm} | หมากออก[{','.join(left) or '-'}] | หมากเข้า[{','.join(arr) or '-'}]"
+    return f"turn={stm} | left[{','.join(left) or '-'}] | arrived[{','.join(arr) or '-'}]"

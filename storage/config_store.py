@@ -48,7 +48,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "undo_detection": "Ctrl+Z",
         "recalibrate": "Ctrl+Shift+C",
     },
-    "language": "th",
+    "language": "en",
 }
 
 

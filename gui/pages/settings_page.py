@@ -35,11 +35,11 @@ class SettingsPage(QWidget):
         self.edits: dict[str, QLineEdit] = {}
         form = QFormLayout()
         labels = {
-            "toggle_capture": "เริ่ม/หยุดจับภาพ (F8)",
-            "analyze": "วิเคราะห์ (F9)",
-            "toggle_overlay": "เปิด/ปิด Overlay (F10)",
-            "undo_detection": "ย้อนการตรวจจับ (Ctrl+Z)",
-            "recalibrate": "Calibrate ใหม่ (Ctrl+Shift+C)",
+            "toggle_capture": "Start/stop capture (F8)",
+            "analyze": "Analyze (F9)",
+            "toggle_overlay": "Toggle Overlay (F10)",
+            "undo_detection": "Undo detection (Ctrl+Z)",
+            "recalibrate": "Recalibrate (Ctrl+Shift+C)",
         }
         for key, lab in labels.items():
             edit = QLineEdit(str(hotkeys.get(key, "")))
@@ -55,11 +55,11 @@ class SettingsPage(QWidget):
         self.debounce.setSuffix(" ms")
         self.debounce.setValue(state.profile.thresholds.debounce_ms)
         form.addRow("Confidence threshold", self.conf_spin)
-        form.addRow("Debounce (นิ่งก่อนยืนยัน)", self.debounce)
+        form.addRow("Debounce (stable before confirm)", self.debounce)
 
-        self.chk_auto_recal = QCheckBox("Auto Recalibration (เมื่อตรวจขอบกระดานได้มั่นใจ)")
+        self.chk_auto_recal = QCheckBox("Auto Recalibration (when board edges are detected confidently)")
         self.chk_auto_recal.setChecked(state.auto_recalibrate)
-        self.chk_auto_analyze = QCheckBox("วิเคราะห์อัตโนมัติเฉพาะตาของผู้ใช้")
+        self.chk_auto_analyze = QCheckBox("Auto-analyze only on the user's turn")
         self.chk_auto_analyze.setChecked(state.auto_analyze_on_user_turn)
 
         self.overlay_opacity = QDoubleSpinBox()
@@ -69,10 +69,10 @@ class SettingsPage(QWidget):
         self.overlay_thick = QSpinBox()
         self.overlay_thick.setRange(1, 12)
         self.overlay_thick.setValue(state.profile.overlay.arrow_thickness)
-        form.addRow("Overlay ความโปร่งใสลูกศร", self.overlay_opacity)
-        form.addRow("Overlay ความหนาลูกศร", self.overlay_thick)
+        form.addRow("Overlay arrow opacity", self.overlay_opacity)
+        form.addRow("Overlay arrow thickness", self.overlay_thick)
 
-        btn_save = QPushButton("บันทึก Settings")
+        btn_save = QPushButton("Save Settings")
         btn_save.setObjectName("primaryButton")
         btn_save.clicked.connect(self.save)
 
@@ -83,20 +83,20 @@ class SettingsPage(QWidget):
         bl.addWidget(self.chk_auto_analyze)
         bl.addWidget(btn_save)
 
-        paths = QGroupBox("ที่เก็บข้อมูล (local)")
+        paths = QGroupBox("Data storage (local)")
         pl = QVBoxLayout(paths)
         pl.addWidget(QLabel(f"User data: {user_data_dir()}"))
         pl.addWidget(QLabel(f"Config: {config_path()}"))
         pl.addWidget(QLabel(f"Logs: {logs_dir()}"))
 
-        ethics = QGroupBox("ขอบเขตการใช้งาน")
+        ethics = QGroupBox("Usage scope")
         el = QVBoxLayout(ethics)
         el.addWidget(
             QLabel(
-                "• ใช้สำหรับฝึกซ้อม เล่นส่วนตัว เล่นกับบอท และวิเคราะห์เกมที่อนุญาต\n"
-                "• ห้ามควบคุมเมาส์ / เดินหมากอัตโนมัติ / หลบระบบป้องกันการโกง\n"
-                "• ไม่อัปโหลดภาพหน้าจอหรือข้อมูลเกมออกจากเครื่อง\n"
-                "• Overlay แสดงผลอย่างเดียว — click-through ไม่บังเกม"
+                "• For practice, private play, playing bots, and analyzing allowed games\n"
+                "• Do not control the mouse / auto-move pieces / evade anti-cheat systems\n"
+                "• Do not upload screenshots or game data off this machine\n"
+                "• Overlay is display-only — click-through does not block the game"
             )
         )
 
@@ -123,4 +123,4 @@ class SettingsPage(QWidget):
         self.state.config.set("auto_recalibrate", self.state.auto_recalibrate)
         self.state.config.save()
         self.state.save_profile()
-        self.state.status_message.emit("บันทึก Settings แล้ว")
+        self.state.status_message.emit("Settings saved")

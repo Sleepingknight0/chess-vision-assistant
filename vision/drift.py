@@ -44,7 +44,7 @@ class DriftDetector:
             return DriftResult(
                 True,
                 dist,
-                "ตำแหน่งกระดานเปลี่ยน กรุณา Calibrate ใหม่",
+                "Board position changed — please recalibrate",
             )
         return DriftResult(False, dist, "")
 

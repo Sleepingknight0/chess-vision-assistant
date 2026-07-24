@@ -56,32 +56,32 @@ class OverlayToolbar(QWidget):
 
         self.lbl_best = QLabel("Best: —")
         self.lbl_best.setFont(QFont("Segoe UI", 11, QFont.Weight.Bold))
-        self.btn_best = QPushButton("เดินตาม Best Move")
+        self.btn_best = QPushButton("Play Best Move")
         self.btn_best.setObjectName("best")
         self.btn_best.setToolTip(
-            "บันทึกตาคุณตาม Stockfish (ในโปรแกรม) — คุณเดินในเกมเอง"
+            "Record your move from Stockfish (in the app) — you still move in the game yourself"
         )
         self.btn_best.clicked.connect(self.apply_best_requested)
-        self.btn_win = QPushButton("⚔️ เอาชนะ")
+        self.btn_win = QPushButton("⚔️ Win focus")
         self.btn_win.setObjectName("win")
-        self.btn_win.setToolTip("เดินตาที่เน้นเอาชนะ/บุก (PV2)")
+        self.btn_win.setToolTip("Play the aggressive / win-focused line (PV2)")
         self.btn_win.clicked.connect(self.apply_win_requested)
-        self.btn_opp = QPushButton("คลิกใส่ตาคู่แข่ง")
+        self.btn_opp = QPushButton("Click opponent move")
         self.btn_opp.setObjectName("opp")
         self.btn_opp.setCheckable(True)
         self.btn_opp.setToolTip(
-            "เปิดโหมดคลิกบนกระดานในเกม แล้วคลิกต้นทาง→ปลายทางที่คู่แข่งเดิน"
+            "Enable click mode on the in-game board, then click from→to for the opponent's move"
         )
         self.btn_opp.clicked.connect(self.opponent_move_requested)
-        self.btn_auto = QPushButton("วนอัตโนมัติ")
+        self.btn_auto = QPushButton("Auto cycle")
         self.btn_auto.setObjectName("auto")
         self.btn_auto.setCheckable(True)
         self.btn_auto.setToolTip(
-            "เปิดโหมดวน: กด Best Move → สลับใส่ตาคู่แข่งให้เอง → เสร็จแล้ววนกลับ"
-            " มาปุ่มเขียวเอง ไม่ต้องกดสลับเอง"
+            "Cycle mode: press Best Move → switch to opponent entry → when done, "
+            "return to the green button automatically (no manual toggling)"
         )
         self.btn_auto.clicked.connect(self.auto_cycle_requested)
-        self.btn_analyze = QPushButton("วิเคราะห์ใหม่")
+        self.btn_analyze = QPushButton("Re-analyze")
         self.btn_analyze.clicked.connect(self.analyze_requested)
 
         lay.addWidget(self.lbl_best)
@@ -106,11 +106,11 @@ class OverlayToolbar(QWidget):
 
     def set_click_mode(self, on: bool) -> None:
         self.btn_opp.setChecked(on)
-        self.btn_opp.setText("ใส่ตาคู่แข่ง: เปิด" if on else "คลิกใส่ตาคู่แข่ง")
+        self.btn_opp.setText("Opponent move: ON" if on else "Click opponent move")
 
     def set_auto_cycle(self, on: bool) -> None:
         self.btn_auto.setChecked(on)
-        self.btn_auto.setText("วนอัตโนมัติ: เปิด" if on else "วนอัตโนมัติ")
+        self.btn_auto.setText("Auto cycle: ON" if on else "Auto cycle")
 
     def place_under(self, region: CaptureRegion) -> None:
         """Center this bar just below the board region, clamped to the screen."""

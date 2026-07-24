@@ -80,7 +80,7 @@ class MoveDetectionService:
         if tops:
             debug += f" | {tops}"
         if ch_txt:
-            debug += f" | Δช่อง[{ch_txt}]"
+            debug += f" | Δsq[{ch_txt}]"
 
         if result.move is None:
             self._pending = None
@@ -114,7 +114,7 @@ class MoveDetectionService:
         )
         self._pending = hyp
 
-        if force or "พร้อมยืนยัน" in result.message:
+        if force or "ready to confirm" in result.message:
             return DetectionEvent(
                 "move",
                 hypothesis=hyp,

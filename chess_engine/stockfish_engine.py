@@ -18,9 +18,9 @@ logger = logging.getLogger(__name__)
 
 
 PRESETS = {
-    "fast": {"movetime_ms": 150, "label": "เร็ว (100–200 ms)"},
-    "balanced": {"movetime_ms": 750, "label": "สมดุล (500–1000 ms)"},
-    "deep": {"movetime_ms": 3500, "label": "ลึก (2–5 วินาที)"},
+    "fast": {"movetime_ms": 150, "label": "Fast (100–200 ms)"},
+    "balanced": {"movetime_ms": 750, "label": "Balanced (500–1000 ms)"},
+    "deep": {"movetime_ms": 3500, "label": "Deep (2–5 s)"},
 }
 
 
@@ -47,22 +47,22 @@ class StockfishEngine:
 
     def validate(self) -> tuple[bool, str]:
         if not self.path:
-            return False, "ยังไม่ได้เลือกไฟล์ stockfish.exe"
+            return False, "stockfish.exe not selected"
         p = Path(self.path)
         if not p.is_file():
-            return False, f"ไม่พบ Stockfish: {self.path}"
+            return False, f"Stockfish not found: {self.path}"
         try:
             eng = chess.engine.SimpleEngine.popen_uci(self.path)
             eng.quit()
-            return True, "Stockfish พร้อมใช้งาน"
+            return True, "Stockfish ready"
         except Exception as exc:  # noqa: BLE001
             logger.exception("Stockfish validate failed")
-            return False, f"เปิด Engine ไม่ได้: {exc}"
+            return False, f"Could not start engine: {exc}"
 
     def _ensure(self) -> chess.engine.SimpleEngine:
         if self._engine is None:
             if not self.path or not Path(self.path).is_file():
-                raise FileNotFoundError("ไม่พบ Stockfish")
+                raise FileNotFoundError("Stockfish not found")
             self._engine = chess.engine.SimpleEngine.popen_uci(self.path)
         return self._engine
 
@@ -110,7 +110,7 @@ class StockfishEngine:
         try:
             board = chess.Board(fen)
         except ValueError as exc:
-            result.error = f"FEN ไม่ถูกต้อง: {exc}"
+            result.error = f"Invalid FEN: {exc}"
             return result
 
         try:
@@ -161,10 +161,10 @@ class StockfishEngine:
                 result.best_move_san = lines[0].move_san
                 result.evaluation = lines[0].score
         except FileNotFoundError:
-            result.error = "ไม่พบ Stockfish — เลือกไฟล์ stockfish.exe ในหน้า Engine"
+            result.error = "Stockfish not found — select stockfish.exe on the Engine page"
         except Exception as exc:  # noqa: BLE001
             logger.exception("analyze failed")
-            result.error = f"วิเคราะห์ไม่สำเร็จ: {exc}"
+            result.error = f"Analysis failed: {exc}"
             self.close()
         return result
 
@@ -230,29 +230,32 @@ def _score_to_eval(score_obj: object, turn: chess.Color) -> EvalScore:
 
 
 def explain_move_th(board: chess.Board, move: chess.Move, san: str) -> str:
-    """Rule-based Thai explanation (no cloud LLM)."""
+    """Rule-based English explanation (no cloud LLM).
+
+    Attribute name explanation_th is kept for API compatibility.
+    """
     parts: list[str] = []
     fr = chess.square_name(move.from_square)
     to = chess.square_name(move.to_square)
-    parts.append(f"แนะนำให้เดินจาก {fr} ไป {to}")
+    parts.append(f"Suggested move from {fr} to {to}")
 
     if board.is_castling(move):
         if move.to_square > move.from_square:
-            parts.append("เป็นการโรเคดด้านคิง (Kingside Castling)")
+            parts.append("Kingside castling")
         else:
-            parts.append("เป็นการโรเคดด้านควีน (Queenside Castling)")
+            parts.append("Queenside castling")
     if board.is_en_passant(move):
-        parts.append("เป็นการกินแบบ En Passant")
+        parts.append("En passant capture")
     if board.is_capture(move) and not board.is_en_passant(move):
-        parts.append("เป็นการกินหมาก (Capture)")
+        parts.append("Capture")
     if move.promotion:
         names = {
-            chess.QUEEN: "ควีน",
-            chess.ROOK: "เรือ",
-            chess.BISHOP: "บิชอป",
-            chess.KNIGHT: "ม้า",
+            chess.QUEEN: "queen",
+            chess.ROOK: "rook",
+            chess.BISHOP: "bishop",
+            chess.KNIGHT: "knight",
         }
-        parts.append(f"โปรโมทเป็น{names.get(move.promotion, 'หมาก')}")
+        parts.append(f"Promotes to {names.get(move.promotion, 'piece')}")
 
     piece = board.piece_at(move.from_square)
     if piece and piece.piece_type in (chess.KNIGHT, chess.BISHOP):
@@ -260,19 +263,19 @@ def explain_move_th(board: chess.Board, move: chess.Move, san: str) -> str:
         if (piece.color == chess.WHITE and from_rank == 0) or (
             piece.color == chess.BLACK and from_rank == 7
         ):
-            parts.append("เพื่อพัฒนาหมากออกจากแถวหลัง")
+            parts.append("Develops a piece off the back rank")
 
     if to in {"d4", "d5", "e4", "e5"}:
-        parts.append("เพื่อควบคุมช่องกลาง")
+        parts.append("Controls the center")
 
     # Check / mate after move
     temp = board.copy()
     try:
         temp.push(move)
         if temp.is_checkmate():
-            parts.append("รุกจนหมาก!")
+            parts.append("Checkmate!")
         elif temp.is_check():
-            parts.append("เป็นการรุกคิง (Check)")
+            parts.append("Check")
     except Exception:  # noqa: BLE001
         pass
 
