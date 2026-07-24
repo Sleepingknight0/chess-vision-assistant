@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "active_profile": "roblox_light_dark_cherry",
+  "stockfish_path": "",
+  "analysis_preset": "balanced",
+  "multipv": 3,
+  "warped_board_size": 512,
+  "confidence_threshold": 0.85,
+  "capture_backend": "mss",
+  "auto_recalibrate": false,
+  "save_move_screenshots": false,
+  "grok_api_key": "",
+  "grok_model": "grok-4-fast-reasoning",
+  "syzygy_path": "",
+  "book_path": "",
+  "hotkeys": {
+    "toggle_capture": "F8",
+    "analyze": "F9",
+    "toggle_overlay": "F10",
+    "undo_detection": "Ctrl+Z",
+    "recalibrate": "Ctrl+Shift+C"
+  },
+  "language": "th"
+}

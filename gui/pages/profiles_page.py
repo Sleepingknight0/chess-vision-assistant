@@ -1,0 +1,98 @@
+"""Profiles management (Phase 1 basic)."""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Optional
+
+from PySide6.QtWidgets import (
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QListWidget,
+    QMessageBox,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
+)
+
+from profiles.models import Profile
+
+if TYPE_CHECKING:
+    from gui.app_state import AppState
+
+
+class ProfilesPage(QWidget):
+    def __init__(self, state: AppState, parent: Optional[QWidget] = None) -> None:
+        super().__init__(parent)
+        self.state = state
+
+        title = QLabel("Profiles")
+        title.setObjectName("titleLabel")
+
+        self.list = QListWidget()
+        self.name_edit = QLineEdit()
+        self.name_edit.setPlaceholderText("ชื่อ Profile ใหม่")
+
+        btn_refresh = QPushButton("รีเฟรช")
+        btn_refresh.clicked.connect(self.refresh)
+        btn_load = QPushButton("โหลดที่เลือก")
+        btn_load.clicked.connect(self.load_selected)
+        btn_save = QPushButton("บันทึกปัจจุบัน")
+        btn_save.setObjectName("primaryButton")
+        btn_save.clicked.connect(self.save_current)
+        btn_new = QPushButton("สร้างใหม่จากปัจจุบัน")
+        btn_new.clicked.connect(self.create_new)
+
+        row = QHBoxLayout()
+        row.addWidget(btn_refresh)
+        row.addWidget(btn_load)
+        row.addWidget(btn_save)
+        row.addWidget(self.name_edit, 1)
+        row.addWidget(btn_new)
+
+        layout = QVBoxLayout(self)
+        layout.addWidget(title)
+        layout.addWidget(
+            QLabel("แต่ละ Profile เก็บ ROI, มุม 4 จุด, ฝ่าย, orientation, engine, thresholds")
+        )
+        layout.addLayout(row)
+        layout.addWidget(self.list, 1)
+        self.refresh()
+
+    def refresh(self) -> None:
+        self.list.clear()
+        for name in self.state.profiles.list_names():
+            mark = " ★" if name == self.state.profile.name else ""
+            self.list.addItem(name + mark)
+
+    def load_selected(self) -> None:
+        item = self.list.currentItem()
+        if not item:
+            return
+        name = item.text().replace(" ★", "")
+        try:
+            profile = self.state.profiles.load(name)
+            self.state.apply_profile(profile)
+            self.state.config.set("active_profile", name)
+            self.state.config.save()
+            self.refresh()
+            self.state.status_message.emit(f"โหลด Profile: {name}")
+        except Exception as exc:  # noqa: BLE001
+            QMessageBox.warning(self, "โหลดไม่สำเร็จ", str(exc))
+
+    def save_current(self) -> None:
+        self.state.save_profile()
+        self.refresh()
+
+    def create_new(self) -> None:
+        name = self.name_edit.text().strip()
+        if not name:
+            QMessageBox.information(self, "ชื่อว่าง", "ใส่ชื่อ Profile ก่อน")
+            return
+        self.state.sync_profile_from_state()
+        new_p = Profile.from_dict(self.state.profile.to_dict())
+        new_p.name = name
+        self.state.profile = new_p
+        self.state.save_profile()
+        self.refresh()
+        self.state.status_message.emit(f"สร้าง Profile: {name}")

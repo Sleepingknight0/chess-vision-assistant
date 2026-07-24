@@ -1,0 +1,7 @@
+PySide6>=6.6
+python-chess>=1.999
+numpy>=1.26
+Pillow>=10.0
+opencv-python-headless>=4.8
+mss>=9.0
+pytest>=8.0

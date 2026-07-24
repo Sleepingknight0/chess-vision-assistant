@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chess-god-board"
+version = "0.1.0"
+description = "Side-panel Stockfish coach for chess practice and analysis (Windows)"
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+  "PySide6>=6.6",
+  "opencv-python-headless>=4.8",
+  "numpy>=1.26",
+  "mss>=9.0",
+  "python-chess>=1.999",
+  "Pillow>=10.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "pyinstaller>=6.0"]
+windows = ["dxcam>=0.0.5"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.setuptools.packages.find]
+include = [
+  "app*",
+  "gui*",
+  "capture*",
+  "vision*",
+  "board_detection*",
+  "move_detection*",
+  "chess_core*",
+  "chess_engine*",
+  "overlay*",
+  "profiles*",
+  "storage*",
+]

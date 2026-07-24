@@ -1,0 +1,49 @@
+# Virtual env / Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+dist/
+build/
+*.spec.bak
+
+# Test / type / IDE caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.idea/
+.vscode/
+*.swp
+
+# Bootstrap / local junk
+get-pip.py
+*.log
+.DS_Store
+Thumbs.db
+_debug_*.png
+Screenshot*.png
+awdwad.png
+
+# Local secrets (never commit API keys)
+.env
+.env.*
+!.env.example
+config.local.json
+
+# Engines & tablebases (large binaries — download separately)
+engines/stockfish.exe
+engines/stockfish*.exe
+engines/*.zip
+engines/stockfish_sf18/
+engines/syzygy/
+engines/books/*.bin
+engines/*.log
+
+# Build output
+*.exe
+!scripts/**
