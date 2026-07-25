@@ -105,5 +105,6 @@ python -m app
 
 ## License
 
-Code in this repo is licensed as stated in the repository.  
-**Stockfish** is separate software under the **GPL** — download and use it under upstream terms.
+Code in this repo is released under the **MIT License** — see [LICENSE](LICENSE).
+
+**Stockfish** is separate software under the **GPL**. It is not bundled in this repo or in the build; you download it yourself and use it under upstream terms. Because it stays a separate executable that the app talks to over UCI, its GPL terms do not extend to this code.
