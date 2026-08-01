@@ -1,11 +1,29 @@
-# Engines (not in git)
+# Local Chess Engines and Data
 
-This folder holds large files that are **not committed** to GitHub.
+This directory is reserved for large third-party analysis files used by Chess Vision Assistant. These files are intentionally excluded from Git.
 
-| File / folder | How to obtain |
-|---------------|---------------|
-| `stockfish.exe` | Download from [stockfishchess.org](https://stockfishchess.org/download/) and place it here, or use the **Stockfish…** button in the app |
-| `books/komodo.bin` (or another book) | Add a polyglot book file and point to its path in the app (**Book…**) |
-| `syzygy/` | 3–5 piece endgame tablebases: `python tools/download_syzygy_345.py` |
+## Supported resources
 
-See also: `scripts/download_stockfish_note.md`
+| Resource              | Recommended location       | Installation                                                                                                               |
+| --------------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Stockfish             | `engines/stockfish.exe`    | Download the Windows build from [stockfishchess.org](https://stockfishchess.org/download/) and extract the executable here |
+| Polyglot opening book | `engines/books/<name>.bin` | Supply a compatible book and select it through the application                                                             |
+| Syzygy tablebases     | `engines/syzygy/`          | Run `python tools/download_syzygy_345.py` for the supported three-to-five-piece set                                        |
+
+Resources can also remain elsewhere on the computer and be selected through the application settings.
+
+## Stockfish setup
+
+1. Download the official Windows package.
+2. Choose an AVX2 or generic build that matches the target computer.
+3. Extract the executable.
+4. Place it at `engines\stockfish.exe` or select its external path in the application.
+5. Start an analysis to confirm that the UCI process launches correctly.
+
+See [`../scripts/download_stockfish_note.md`](../scripts/download_stockfish_note.md) for the standalone installation note.
+
+## Version-control policy
+
+Do not commit engine executables, opening books, tablebase files, downloaded archives, or generated analysis data.
+
+Third-party resources retain their original licences. Stockfish is distributed under the GNU General Public License and remains separate from this MIT-licensed application.
