@@ -176,4 +176,4 @@ Diagnostics redact common API-key and bearer-token patterns before display or ex
 
 The application source is released under the [MIT License](LICENSE).
 
-Stockfish is separate software distributed under the GNU General Public License. It is not bundled with this project; users download and operate it under the upstream licence terms.
+Stockfish is separate software distributed under the GNU General Public License. It is not bundled with this project; users download and operate it under the upstream license terms.
