@@ -29,7 +29,7 @@ The application does not control the mouse or play moves automatically. Users re
 - Position editor (**Set up pieces**) with FEN load/apply when the tracked board drifts.
 - Redacted rotating logs under the user data directory.
 
-Vision, capture (MSS / optional DXCam), move-detection, profile, PGN-export, and Grok helper packages remain in the repository, including additional `gui/pages` modules, but they are **not wired into the current main window** launched by `python -m app`.
+Vision, capture (MSS / optional DXCam), move-detection, profile, PGN-export, and Grok helper packages remain in the repository, along with additional `gui/pages` modules. Those packages are **not wired into the current main window** launched by `python -m app`.
 
 ## Requirements
 
@@ -111,7 +111,7 @@ Engine binaries, opening books, and tablebases are intentionally excluded from G
 
 ## Testing
 
-Run the unit suite and import smoke test:
+Run the unit-test suite and the import smoke test:
 
 ```powershell
 pytest -q
